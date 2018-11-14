@@ -12,14 +12,14 @@ flow.execute();
 
 
 
-## now support source/sink type 
+## support source/sink type 
 |          name                        |    demo            |   status   | 
 | :-----------------------------------:|:------------------:|:----------:|
-| [collection](docs/collection.md')    | CollectionDemo.java|   complete | 
+| [collection](docs/collection.md)     | CollectionDemo.java|   complete | 
 | [csv](docs/csv.md)                   |   CsvDemo.java     |   complete | 
 |      mysql                           |                    |   doing    | 
 |   elasticsearch                      |                    |   doing    | 
-|   kafka                              |                    |   doing    | 
+|   kafka                              |                    |   todo     | 
 |   hbase                              |                    |   todo     | 
 
 
