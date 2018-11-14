@@ -10,13 +10,16 @@ Flow flow = new Flow(sql);
 flow.execute();
 ```
 
+
+
 ## now support source/sink type 
 |          name                        |    demo            |   status   | 
 | :-----------------------------------:|:------------------:|:----------:|
-| [collection](./docs/collection.md')  | CollectionDemo.java|   complete | 
-| [csv](./docs/csv.md)                 |   CsvDemo.java     |   complete | 
+| [collection](docs/collection.md')    | CollectionDemo.java|   complete | 
+| [csv](docs/csv.md)                   |   CsvDemo.java     |   complete | 
 |      mysql                           |                    |   doing    | 
 |   elasticsearch                      |                    |   doing    | 
+|   kafka                              |                    |   doing    | 
 |   hbase                              |                    |   todo     | 
 
 
@@ -31,5 +34,7 @@ flow.execute();
 
 ## Thanks  
   <a href='#'>flink</a>    
+  
   <a href='#'>blink</a>    
+  
   <a href='https://github.com/DTStack/flinkStreamSQL'>flinkStreamSQL</a> 
