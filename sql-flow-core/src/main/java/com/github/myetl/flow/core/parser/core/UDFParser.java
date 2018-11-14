@@ -1,7 +1,8 @@
 package com.github.myetl.flow.core.parser.core;
 
 
-import com.github.myetl.flow.core.parser.SqlParseException;
+import com.github.myetl.flow.core.exception.SqlParseException;
+import com.github.myetl.flow.core.parser.SQL;
 import com.github.myetl.flow.core.parser.SqlTree;
 import com.github.myetl.flow.core.parser.UDF;
 
@@ -30,7 +31,7 @@ public class UDFParser implements IParser {
     }
 
     @Override
-    public void parse(String sql, SqlTree sqlTree) throws SqlParseException {
+    public SQL parse(String sql, SqlTree sqlTree) throws SqlParseException {
         Matcher matcher = FuncPattern.matcher(sql);
         if (matcher.find()) {
             String funcName = matcher.group(1).trim();
@@ -38,6 +39,8 @@ public class UDFParser implements IParser {
 
             UDF udf = new UDF(funcName, className);
             sqlTree.addUdf(udf);
+            return udf;
         }
+        return null;
     }
 }

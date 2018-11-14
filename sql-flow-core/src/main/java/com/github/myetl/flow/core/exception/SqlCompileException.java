@@ -1,9 +1,9 @@
-package com.github.myetl.flow.core.runtime;
+package com.github.myetl.flow.core.exception;
 
 /**
  * sql to flink compile exception
  */
-public class SqlCompileException extends Exception {
+public class SqlCompileException extends FlowException {
 
     public SqlCompileException() {
     }

@@ -1,36 +1,35 @@
 # sql flow based on flink 
 
+use sql to run flink job 
 
-see demo1.java 
+## how to use 
 
 ``` 
-create table person1( 
-    age int, 
-    name varchar 
-) with ( 
-    type='csv', 
-    path='dir/person.csv'
-); 
-                
-create table person2( 
-    age int, 
-    name varchar 
-) with ( 
-    type='csv', 
-    path='dir/person2' 
-); 
-
-
-INSERT INTO person2 
-SELECT 
-    age, 
-    name 
-FROM person1 where age > 2; 
-
+String sql = "..."; 
+Flow flow = new Flow(sql);
+flow.execute();
 ```
 
-Thanks 
+## now support source/sink type 
+|          name                        |    demo            |   status   | 
+| :-----------------------------------:|:------------------:|:----------:|
+| [collection](./docs/collection.md')  | CollectionDemo.java|   complete | 
+| [csv](./docs/csv.md)                 |   CsvDemo.java     |   complete | 
+|      mysql                           |                    |   doing    | 
+|   elasticsearch                      |                    |   doing    | 
+|   hbase                              |                    |   todo     | 
 
-<a href='#'>flink</a> 
-<a href='#'>blink</a> 
-<a href='https://github.com/DTStack/flinkStreamSQL'>flinkStreamSQL</a> 
+
+## flink run model 
+*  local        support 
+*  standalone    todo 
+*  yarn          todo 
+
+
+## web ui todo 
+
+
+## Thanks  
+  <a href='#'>flink</a>    
+  <a href='#'>blink</a>    
+  <a href='https://github.com/DTStack/flinkStreamSQL'>flinkStreamSQL</a> 

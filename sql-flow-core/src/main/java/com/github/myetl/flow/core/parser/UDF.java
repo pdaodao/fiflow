@@ -3,7 +3,7 @@ package com.github.myetl.flow.core.parser;
 /**
  * udf : CREATE FUNCTION stringLengthUdf AS 'com.hjc.test.blink.sql.udx.StringLengthUdf';
  */
-public class UDF {
+public class UDF extends SQL {
     private final String funcName;
     private final String className;
 

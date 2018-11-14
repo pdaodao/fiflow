@@ -1,7 +1,8 @@
 package com.github.myetl.flow.core.runtime;
 
+import com.github.myetl.flow.core.exception.SqlCompileException;
 import com.github.myetl.flow.core.parser.DDL;
-import org.apache.flink.table.api.TableEnvironment;
+import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.TableSource;
 
@@ -18,7 +19,7 @@ public interface DDLToFlinkCompiler {
 
     boolean supportSink();
 
-    TableSource buildSource(DDL ddl, TableEnvironment env);
+    TableSource buildSource(DDL ddl, RowTypeInfo rowTypeInfo) throws SqlCompileException;
 
-    TableSink buildSink(DDL ddl, TableEnvironment env);
+    TableSink buildSink(DDL ddl, RowTypeInfo rowTypeInfo) throws SqlCompileException;
 }

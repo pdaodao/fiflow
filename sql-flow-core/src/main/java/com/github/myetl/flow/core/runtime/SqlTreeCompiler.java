@@ -1,6 +1,9 @@
 package com.github.myetl.flow.core.runtime;
 
 
+import com.github.myetl.flow.core.exception.FlowException;
+import com.github.myetl.flow.core.exception.SqlCompileException;
+import com.github.myetl.flow.core.exception.SqlRunException;
 import com.github.myetl.flow.core.parser.DDL;
 import com.github.myetl.flow.core.parser.DML;
 import com.github.myetl.flow.core.parser.SqlTree;
@@ -19,7 +22,7 @@ import java.util.Map;
 public class SqlTreeCompiler {
 
 
-    public static void compile(SqlTree sqlTree, TableEnvironment env) throws SqlCompileException {
+    public static void compile(SqlTree sqlTree, TableEnvironment env) throws FlowException {
         Map<String, DDL> tables = new LinkedHashMap<>();
         for (DDL ddl : sqlTree.getDdls()) {
             tables.put(ddl.getTableName(), ddl);
@@ -41,21 +44,25 @@ public class SqlTreeCompiler {
 
         try {
             for (DDL s : source.values()) {
-                TableSource tableSource = SqlTableSourceFactory.getTableSource(s, env);
+                RowTypeInfo rowTypeInfo = FlinkFieldTypeUtil.toFlinkType(s);
+                TableSource tableSource = DDLCompileFactory.getTableSource(s, rowTypeInfo);
                 env.registerTableSource(s.getTableName(), tableSource);
             }
             for (DDL s : sink.values()) {
                 RowTypeInfo rowTypeInfo = FlinkFieldTypeUtil.toFlinkType(s);
-                TableSink tableSink = SqlTableSinkFactory.getTableSink(s, env);
+                TableSink tableSink = DDLCompileFactory.getTableSink(s, rowTypeInfo);
                 env.registerTableSink(s.getTableName(), rowTypeInfo.getFieldNames(), rowTypeInfo.getFieldTypes(), tableSink);
             }
+        } catch (Exception e) {
+            throw new SqlCompileException(e);
+        }
 
+        try {
             for (DML dml : sqlTree.getDmls()) {
                 env.sqlUpdate(dml.getSql());
             }
-
         } catch (Exception e) {
-            throw new SqlCompileException(e);
+            throw new SqlRunException(e);
         }
     }
 

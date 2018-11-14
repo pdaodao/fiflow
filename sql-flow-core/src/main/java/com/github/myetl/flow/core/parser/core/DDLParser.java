@@ -2,8 +2,9 @@ package com.github.myetl.flow.core.parser.core;
 
 
 import com.github.myetl.flow.core.enums.FieldType;
+import com.github.myetl.flow.core.exception.SqlParseException;
 import com.github.myetl.flow.core.parser.DDL;
-import com.github.myetl.flow.core.parser.SqlParseException;
+import com.github.myetl.flow.core.parser.SQL;
 import com.github.myetl.flow.core.parser.SqlTree;
 import com.github.myetl.flow.core.util.SqlParseUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -92,7 +93,8 @@ public class DDLParser implements IParser {
      * @param ddlTableInfo
      */
     private void parseWithProps(String withStr, DDL ddlTableInfo) throws SqlParseException {
-        String[] props = withStr.trim().split("\\s*,");
+        List<String> props = SqlParseUtil.splitIgnoreQuota(withStr.trim(), ',');
+
         Map<String, Object> propMap = Maps.newHashMap();
         for (String prop : props) {
             List<String> line = SqlParseUtil.splitIgnoreQuota(prop, '=');
@@ -112,7 +114,7 @@ public class DDLParser implements IParser {
 
 
     @Override
-    public void parse(String sql, SqlTree sqlTree) throws SqlParseException {
+    public SQL parse(String sql, SqlTree sqlTree) throws SqlParseException {
         Matcher matcher = PATTERN.matcher(sql);
 
         if (matcher.find()) {
@@ -133,7 +135,8 @@ public class DDLParser implements IParser {
                 }
             }
             sqlTree.addDDL(ddlTableInfo);
+            return ddlTableInfo;
         }
-
+        return null;
     }
 }

@@ -1,7 +1,8 @@
 package com.github.myetl.flow.core.parser.core;
 
+import com.github.myetl.flow.core.exception.SqlParseException;
 import com.github.myetl.flow.core.parser.DML;
-import com.github.myetl.flow.core.parser.SqlParseException;
+import com.github.myetl.flow.core.parser.SQL;
 import com.github.myetl.flow.core.parser.SqlTree;
 import org.apache.calcite.avatica.util.Casing;
 import org.apache.calcite.sql.*;
@@ -28,7 +29,7 @@ public class DMLParser implements IParser {
     }
 
     @Override
-    public void parse(String sql, SqlTree sqlTree) throws SqlParseException {
+    public SQL parse(String sql, SqlTree sqlTree) throws SqlParseException {
 
         SqlParser.ConfigBuilder configBuilder = SqlParser.configBuilder();
         configBuilder.setQuotedCasing(Casing.UNCHANGED);
@@ -48,6 +49,7 @@ public class DMLParser implements IParser {
         DML dml = new DML(sqlNode.toString());
         parseNode(sqlNode, dml);
         sqlTree.addDml(dml);
+        return dml;
     }
 
     private void parseNode(SqlNode sqlNode, DML dml) throws SqlParseException {

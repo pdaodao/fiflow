@@ -8,6 +8,8 @@ import java.util.List;
  */
 public class SqlTree {
 
+    private Boolean isStreaming = false;
+
     /**
      * user define functions
      */
@@ -49,5 +51,14 @@ public class SqlTree {
 
     public List<DML> getDmls() {
         return dmls;
+    }
+
+    public Boolean isStreaming() {
+        return isStreaming;
+    }
+
+    public SqlTree setIsStreaming(Boolean streaming) {
+        isStreaming = streaming;
+        return this;
     }
 }

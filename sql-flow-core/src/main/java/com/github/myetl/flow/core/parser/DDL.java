@@ -5,11 +5,12 @@ import com.github.myetl.flow.core.enums.FieldType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * create table 中的数据表的定义
  */
-public class DDL {
+public class DDL extends SQL {
     /**
      * 数据表名称
      */
@@ -79,6 +80,14 @@ public class DDL {
     public DDL setProps(Map<String, Object> props) {
         this.props = props;
         return this;
+    }
+
+    public String getPropertyAsString(String key) {
+        if (this.props == null) return null;
+        Object object = this.props.get(key);
+        if (object == null) return null;
+        if (object instanceof String) return (String) object;
+        return Objects.toString(object);
     }
 
     /**

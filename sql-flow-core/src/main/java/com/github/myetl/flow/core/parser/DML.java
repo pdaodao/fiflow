@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * INSERT INTO tableName [ (columnName[ , columnName]*) ] queryStatement;
  */
-public class DML {
+public class DML extends SQL {
 
     private final String sql;
     /**

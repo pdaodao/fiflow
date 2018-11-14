@@ -1,10 +1,13 @@
 package com.github.myetl.flow.core.parser;
 
 
+import com.github.myetl.flow.core.exception.SqlParseException;
 import com.github.myetl.flow.core.parser.core.DDLParser;
 import com.github.myetl.flow.core.parser.core.DMLParser;
 import com.github.myetl.flow.core.parser.core.IParser;
 import com.github.myetl.flow.core.parser.core.UDFParser;
+import com.github.myetl.flow.core.runtime.DDLCompileFactory;
+import com.github.myetl.flow.core.runtime.DDLToFlinkCompiler;
 import com.github.myetl.flow.core.util.SqlParseUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.calcite.shaded.com.google.common.collect.Lists;
@@ -48,7 +51,11 @@ public class SqlParser {
                     continue;
                 }
                 hasParser = true;
-                iParser.parse(sqlLine, sqlTree);
+                SQL sqlBlock = iParser.parse(sqlLine, sqlTree);
+                if (sqlBlock != null && sqlBlock instanceof DDL ) {
+                    DDLToFlinkCompiler compiler = DDLCompileFactory.getCompiler((DDL) sqlBlock);
+                    if (compiler != null&& compiler.isStreaming() ) sqlTree.setIsStreaming(true);
+                }
             }
             if (!hasParser) {
                 throw new SqlParseException(String.format("%s:Syntax does not support", sqlLine));
