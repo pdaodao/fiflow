@@ -23,7 +23,7 @@ flow.execute();
 |   hbase                              |                    |   todo     | 
 
 
-## flink run model 
+## flink run mode
 *  local        support 
 *  standalone    todo 
 *  yarn          todo 
