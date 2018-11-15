@@ -7,6 +7,7 @@ import org.apache.flink.api.common.typeinfo.SqlTimeTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.util.CollectionUtil;
+import scala.tools.nsc.backend.jvm.BTypes;
 
 import static org.apache.flink.api.common.typeinfo.BasicTypeInfo.*;
 import static org.apache.flink.api.common.typeinfo.PrimitiveArrayTypeInfo.BYTE_PRIMITIVE_ARRAY_TYPE_INFO;
@@ -42,6 +43,8 @@ public class FlinkFieldTypeUtil {
                 return SHORT_TYPE_INFO;
             case INT:
                 return INT_TYPE_INFO;
+            case LONG:
+                return LONG_TYPE_INFO;
             case BIGINT:
                 return BIG_INT_TYPE_INFO;
             case FLOAT:

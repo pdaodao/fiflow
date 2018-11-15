@@ -20,7 +20,7 @@ import java.io.IOException;
 public abstract class FlowInputFormat extends RichInputFormat<Row, InputSplit>
         implements ResultTypeQueryable<Row> {
 
-    protected RowTypeInfo rowTypeInfo;
+    protected final RowTypeInfo rowTypeInfo;
 
     protected FlowInputFormat(RowTypeInfo rowTypeInfo) {
         if (rowTypeInfo == null) {

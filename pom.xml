@@ -11,8 +11,8 @@
     <modules>
         <module>sql-flow-core</module>
         <module>sql-flow-api</module>
-        <module>sql-flow-connectors</module>
         <module>sql-flow-udf</module>
+        <module>sql-flow-connectors</module>
     </modules>
 
     <properties>

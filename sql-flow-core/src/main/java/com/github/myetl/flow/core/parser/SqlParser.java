@@ -54,7 +54,7 @@ public class SqlParser {
                 SQL sqlBlock = iParser.parse(sqlLine, sqlTree);
                 if (sqlBlock != null && sqlBlock instanceof DDL ) {
                     DDLToFlinkCompiler compiler = DDLCompileFactory.getCompiler((DDL) sqlBlock);
-                    if (compiler != null&& compiler.isStreaming() ) sqlTree.setIsStreaming(true);
+                    if (compiler != null&& compiler.isStreaming() ) sqlTree.setIsStream(true);
                 }
             }
             if (!hasParser) {

@@ -3,6 +3,7 @@
 /.idea/*
 .vertx/
 target/
+MyTest*.java
 *.class
 *.iml
 # Log file

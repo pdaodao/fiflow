@@ -32,17 +32,19 @@ public class Flow {
      */
     public void execute() throws Exception {
         SqlTree sqlTree = SqlParser.parseSql(sql);
-        if (sqlTree.isStreaming()) {
+        if (sqlTree.isStream()) {
             logger.info("-- run sql flow as StreamExecutionEnvironment ");
             StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
             StreamTableEnvironment tableEnv = StreamTableEnvironment.getTableEnvironment(env);
-            SqlTreeCompiler.compile(sqlTree, tableEnv);
+
+            SqlTreeCompiler.compile(sqlTree, tableEnv, env.getConfig());
             env.execute();
         } else {
             logger.info("-- run sql as Batch ExecutionEnvironment ");
             ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
             TableEnvironment tableEnv = TableEnvironment.getTableEnvironment(env);
-            SqlTreeCompiler.compile(sqlTree, tableEnv);
+
+            SqlTreeCompiler.compile(sqlTree, tableEnv, env.getConfig());
             env.execute();
         }
     }

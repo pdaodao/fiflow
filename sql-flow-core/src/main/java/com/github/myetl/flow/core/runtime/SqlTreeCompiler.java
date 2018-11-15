@@ -8,6 +8,7 @@ import com.github.myetl.flow.core.parser.DDL;
 import com.github.myetl.flow.core.parser.DML;
 import com.github.myetl.flow.core.parser.SqlTree;
 import com.github.myetl.flow.core.util.FlinkFieldTypeUtil;
+import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.sinks.TableSink;
@@ -22,7 +23,7 @@ import java.util.Map;
 public class SqlTreeCompiler {
 
 
-    public static void compile(SqlTree sqlTree, TableEnvironment env) throws FlowException {
+    public static void compile(SqlTree sqlTree, TableEnvironment env, ExecutionConfig executionConfig) throws FlowException {
         Map<String, DDL> tables = new LinkedHashMap<>();
         for (DDL ddl : sqlTree.getDdls()) {
             tables.put(ddl.getTableName(), ddl);
@@ -45,12 +46,13 @@ public class SqlTreeCompiler {
         try {
             for (DDL s : source.values()) {
                 RowTypeInfo rowTypeInfo = FlinkFieldTypeUtil.toFlinkType(s);
-                TableSource tableSource = DDLCompileFactory.getTableSource(s, rowTypeInfo);
+                TableSource tableSource = DDLCompileFactory.getTableSource(s, rowTypeInfo, executionConfig);
+
                 env.registerTableSource(s.getTableName(), tableSource);
             }
             for (DDL s : sink.values()) {
                 RowTypeInfo rowTypeInfo = FlinkFieldTypeUtil.toFlinkType(s);
-                TableSink tableSink = DDLCompileFactory.getTableSink(s, rowTypeInfo);
+                TableSink tableSink = DDLCompileFactory.getTableSink(s, rowTypeInfo, executionConfig);
                 env.registerTableSink(s.getTableName(), rowTypeInfo.getFieldNames(), rowTypeInfo.getFieldTypes(), tableSink);
             }
         } catch (Exception e) {

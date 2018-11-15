@@ -2,6 +2,7 @@ package com.github.myetl.flow.core.compilers;
 
 import com.github.myetl.flow.core.parser.DDL;
 import com.github.myetl.flow.core.runtime.DDLToFlinkCompiler;
+import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.sinks.CsvTableSink;
 import org.apache.flink.table.sinks.TableSink;
@@ -47,7 +48,7 @@ public class CsvCompiler implements DDLToFlinkCompiler {
     }
 
     @Override
-    public TableSource buildSource(DDL ddl, RowTypeInfo rowTypeInfo) {
+    public TableSource buildSource(DDL ddl, RowTypeInfo rowTypeInfo, ExecutionConfig executionConfig) {
         String path = (String) ddl.getProps().get(Path);
         path = getFullPath(path);
         TableSource csvSource = new CsvTableSource(path, rowTypeInfo.getFieldNames(), rowTypeInfo.getFieldTypes());
@@ -55,7 +56,7 @@ public class CsvCompiler implements DDLToFlinkCompiler {
     }
 
     @Override
-    public TableSink buildSink(DDL ddl, RowTypeInfo rowTypeInfo) {
+    public TableSink buildSink(DDL ddl, RowTypeInfo rowTypeInfo, ExecutionConfig executionConfig) {
         String path = (String) ddl.getProps().get(Path);
         path = getFullPath(path);
         TableSink sink = new CsvTableSink(path, "|");

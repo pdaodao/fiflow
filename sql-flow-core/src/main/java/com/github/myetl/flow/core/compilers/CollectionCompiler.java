@@ -10,6 +10,7 @@ import com.github.myetl.flow.core.runtime.OutputFormatTableSink;
 import com.github.myetl.flow.core.util.SqlParseUtil;
 import com.github.myetl.flow.core.util.StringCastUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.table.sinks.TableSink;
 import org.apache.flink.table.sources.TableSource;
@@ -45,7 +46,7 @@ public class CollectionCompiler implements DDLToFlinkCompiler {
     }
 
     @Override
-    public TableSource buildSource(DDL ddl, RowTypeInfo rowTypeInfo) throws SqlCompileException {
+    public TableSource buildSource(DDL ddl, RowTypeInfo rowTypeInfo, ExecutionConfig executionConfig) throws SqlCompileException {
         String data = ddl.getPropertyAsString("data");
         if (StringUtils.isEmpty(data))
             throw new SqlCompileException("CollectionSource data is empty");
@@ -67,13 +68,13 @@ public class CollectionCompiler implements DDLToFlinkCompiler {
         }
 
 
-        CollectionInputFormat inputFormat = new CollectionInputFormat(rowTypeInfo, rows);
+        CollectionInputFormat inputFormat = new CollectionInputFormat(rowTypeInfo, rows, executionConfig);
         InputFormatTableSource inputformatTableSource = new InputFormatTableSource(inputFormat);
         return inputformatTableSource;
     }
 
     @Override
-    public TableSink buildSink(DDL ddl, RowTypeInfo rowTypeInfo) throws SqlCompileException {
+    public TableSink buildSink(DDL ddl, RowTypeInfo rowTypeInfo, ExecutionConfig executionConfig) throws SqlCompileException {
         SystemOutOutputFormat outOutputFormat = new SystemOutOutputFormat(rowTypeInfo);
         OutputFormatTableSink sink = new OutputFormatTableSink(outOutputFormat);
         return sink;
