@@ -17,7 +17,7 @@ flow.execute();
 | :-----------------------------------:|:------------------:|:----------:|
 | [collection](docs/collection.md)     | CollectionDemo.java|   complete | 
 | [csv](docs/csv.md)                   |   CsvDemo.java     |   complete | 
-|      mysql                           |                    |   doing    | 
+| [jdbc](docs/jdbc.md)                 |                    |   doing    | 
 |   elasticsearch                      |                    |   doing    | 
 |   kafka                              |                    |   todo     | 
 |   hbase                              |                    |   todo     | 
