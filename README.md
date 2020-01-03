@@ -1,5 +1,6 @@
 # sql flow based on flink 
 
+based on apache flink 1.9
 
 ## How to use 
 ``` java 
@@ -47,24 +48,5 @@ VS
 
 insert into stuout(name,age,class) 
    select name, age, class from student where age > 16
-
-```
-
-## dependency
-
-``` xml
-<dependency>
-    <groupId>com.github.myetl</groupId>
-    <artifactId>sql-flow-core</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
-</dependency>
-
-<!-- add jdbc connector support --> 
-
-<dependency>
-    <groupId>com.github.myetl</groupId>
-    <artifactId>sql-flow-jdbc</artifactId>
-    <version>1.9.1-SNAPSHOT</version>
-</dependency>
 
 ```
