@@ -1,40 +1,70 @@
 # sql flow based on flink 
 
-use sql to run flink job 
 
-## how to use 
+## How to use 
+``` java 
+SqlFlow sqlFlow = SqlFlow.create(true);
+    
+sqlFlow.jdbc()
+        .setDbURL("jdbc:mysql://127.0.0.1:3306/flink")
+        .setUsername("root")
+        .setPassword("root")
+        .setDbName("flink")
+        .setDriverName("com.mysql.jdbc.Driver")
+        .build()
+        .setDbNameUsedInsql("flink");
 
-``` 
-String sql = "..."; 
-Flow flow = new Flow(sql);
-flow.execute();
+sqlFlow.sqlUpdate("insert into stuout(name,age,class) " +
+        "select name, age, class from student where age > 16");
+
+sqlFlow.execute("sqlflow-demo");
+```
+VS
+```
+ CREATE TABLE student ( 
+    name VARCHAR, 
+    age INT, 
+   class VARCHAR 
+ ) WITH ( 
+    'connector.type' = 'jdbc', 
+    'connector.url' = 'jdbc:mysql://127.0.0.1:3306/flink', 
+    'connector.table' = 'student', 
+    'connector.username' = 'root',
+    'connector.password' = 'root'
+)
+
+ CREATE TABLE stuout ( 
+    name VARCHAR, 
+    age INT, 
+   class VARCHAR 
+ ) WITH ( 
+    'connector.type' = 'jdbc', 
+    'connector.url' = 'jdbc:mysql://127.0.0.1:3306/flink', 
+    'connector.table' = 'stuout', 
+    'connector.username' = 'root',
+    'connector.password' = 'root'
+)
+
+insert into stuout(name,age,class) 
+   select name, age, class from student where age > 16
+
 ```
 
+## dependency
 
+``` xml
+<dependency>
+    <groupId>com.github.myetl</groupId>
+    <artifactId>sql-flow-core</artifactId>
+    <version>1.9.1-SNAPSHOT</version>
+</dependency>
 
-## support source/sink type 
-|          name                        |    demo            |   status   | 
-| :-----------------------------------:|:------------------:|:----------:|
-| [collection](docs/collection.md)     | CollectionDemo.java|   complete | 
-| [csv](docs/csv.md)                   |   CsvDemo.java     |   complete | 
-| [jdbc](docs/jdbc.md)                 |                    |   doing    | 
-|   elasticsearch                      |                    |   doing    | 
-|   kafka                              |                    |   todo     | 
-|   hbase                              |                    |   todo     | 
+<!-- add jdbc connector support --> 
 
+<dependency>
+    <groupId>com.github.myetl</groupId>
+    <artifactId>sql-flow-jdbc</artifactId>
+    <version>1.9.1-SNAPSHOT</version>
+</dependency>
 
-## flink run mode
-*  local        support 
-*  standalone    todo 
-*  yarn          todo 
-
-
-## web ui todo 
-
-
-## Thanks  
-  <a href='#'>flink</a>    
-  
-  <a href='#'>blink</a>    
-  
-  <a href='https://github.com/DTStack/flinkStreamSQL'>flinkStreamSQL</a> 
+```
