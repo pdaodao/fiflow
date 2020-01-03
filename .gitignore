@@ -1,5 +1,6 @@
 # Compiled class file
 .idea
+*Test.java
 /.idea/*
 .vertx/
 target/

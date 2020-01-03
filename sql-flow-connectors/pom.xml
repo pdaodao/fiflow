@@ -5,21 +5,25 @@
     <parent>
         <artifactId>sql-flow</artifactId>
         <groupId>com.github.myetl</groupId>
-        <version>1.6.0-SNAPSHOT</version>
+        <version>1.9.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>sql-flow-connectors</artifactId>
     <packaging>pom</packaging>
+
     <modules>
+        <module>sql-flow-elasticsearch</module>
+        <module>sql-flow-kafka</module>
+        <module>sql-flow-hbase</module>
         <module>sql-flow-jdbc</module>
     </modules>
 
     <dependencies>
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.37</version>
+            <groupId>com.github.myetl</groupId>
+            <artifactId>sql-flow-core</artifactId>
+            <version>1.9.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
 

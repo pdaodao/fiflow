@@ -7,20 +7,21 @@
     <groupId>com.github.myetl</groupId>
     <artifactId>sql-flow</artifactId>
     <packaging>pom</packaging>
-    <version>1.6.0-SNAPSHOT</version>
+    <version>1.9.1-SNAPSHOT</version>
     <modules>
         <module>sql-flow-core</module>
         <module>sql-flow-api</module>
-        <module>sql-flow-udf</module>
         <module>sql-flow-connectors</module>
     </modules>
 
+
     <properties>
-        <flink.version>1.6.0</flink.version>
+        <flink.version>1.9.1</flink.version>
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.7</scala.version>
     </properties>
+
 
     <build>
         <plugins>
