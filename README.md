@@ -6,7 +6,7 @@
 - fiflow-web      与前端对应的后台
 - fiflow-api      fiflow 对外提供的操作api 
 - fiflow-core     flink 操作的封装
-- fiflow-runtime  与flink交互 
+- fiflow-runtime  提交任务到flink  local、standalone、yarn 以及与flink集群的交互
 
 ## Thanks 
 - flink 
