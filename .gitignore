@@ -1,4 +1,3 @@
-
 .DS_Store
 node_modules
 /dist
@@ -22,7 +21,8 @@ yarn-error.log*
 *.sw?
 # Compiled class file
 .idea
-*Test
+*test.md
+*Test.java
 *test
 /.idea/*
 .vertx/
