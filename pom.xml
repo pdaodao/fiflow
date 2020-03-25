@@ -5,18 +5,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.myetl</groupId>
-    <artifactId>sql-flow</artifactId>
+    <artifactId>fiflow</artifactId>
     <packaging>pom</packaging>
-    <version>1.9.1-SNAPSHOT</version>
+    <version>1.10-SNAPSHOT</version>
     <modules>
-        <module>sql-flow-core</module>
-        <module>sql-flow-api</module>
-        <module>sql-flow-connectors</module>
+        <module>fiflow-core</module>
+        <module>fiflow-runtime</module>
+        <module>fiflow-api</module>
+        <module>fiflow-web</module>
     </modules>
 
 
     <properties>
-        <flink.version>1.9.1</flink.version>
+        <flink.version>1.10.0</flink.version>
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.7</scala.version>
