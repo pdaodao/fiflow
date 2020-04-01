@@ -12,6 +12,11 @@
     <artifactId>fiflow-core</artifactId>
     <version>1.10-SNAPSHOT</version>
 
+    <properties>
+        <!--日志-->
+        <slf4j.verision>1.7.18</slf4j.verision>
+        <logback.version>1.1.6</logback.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -30,6 +35,28 @@
             <groupId>com.nextbreakpoint</groupId>
             <artifactId>com.nextbreakpoint.flinkclient</artifactId>
             <version>1.0.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <!-- log -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.verision}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.verision}</version>
         </dependency>
 
     </dependencies>

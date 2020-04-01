@@ -11,12 +11,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class FlowSessionManager {
 
     static class SessionWrap{
-        final FlowSession session;
+        final FiFlinkSession session;
         final long createTime;
         long accessTime;
         int count;
 
-        public SessionWrap(FlowSession session) {
+        public SessionWrap(FiFlinkSession session) {
             this.session = session;
             createTime = System.currentTimeMillis();
         }
@@ -35,7 +35,7 @@ public final class FlowSessionManager {
      * @param sessionConfig      session 配置信息
      * @return
      */
-    public static synchronized FlowSession getOrCreateSession(String id, SessionConfig sessionConfig) {
+    public static synchronized FiFlinkSession getOrCreateSession(String id, SessionConfig sessionConfig) {
         if(StringUtils.isEmpty(id)){
             for(int i = 0; i < 30; i++){
                 id = RandomStringUtils.randomAlphanumeric(5);
@@ -44,7 +44,7 @@ public final class FlowSessionManager {
         }
         SessionWrap wrap = sessionMap.get(id);
         if(wrap == null){
-            FlowSession flowSession = new FlowSession(id, sessionConfig);
+            FiFlinkSession flowSession = new FiFlinkSession(id, sessionConfig);
             wrap = new SessionWrap(flowSession);
             sessionMap.putIfAbsent(id,  wrap);
         }

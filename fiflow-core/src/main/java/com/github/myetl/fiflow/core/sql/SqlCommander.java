@@ -12,13 +12,11 @@ import java.util.regex.Pattern;
  * sql 命令 和 参数
  */
 public final class SqlCommander{
-    public final String sql;
 
     public final SqlCommand command;
     public final String[] args;
 
-    public SqlCommander(String sql, SqlCommand  sqlCommand, String[] args) {
-        this.sql = sql;
+    public SqlCommander(SqlCommand  sqlCommand, String[] args) {
         this.command = sqlCommand;
         this.args = args;
     }
@@ -132,8 +130,19 @@ public final class SqlCommander{
 
         RESET("RESET", NO_ARGS),
 
-        SOURCE("SOURCE\\s+(.*)", SINGLE_ARGS);
+        SOURCE("SOURCE\\s+(.*)", SINGLE_ARGS),
 
+        // jar xxx    需要添加的jar包
+        JAR("-*\\s?jar\\s+(.*)", SINGLE_ARGS),
+
+        // udf xxx    用户自定义 先这样写
+        UDF("-*\\s?udf\\s+(.*)", SINGLE_ARGS),
+
+        // flink xxx  表示使用那个 flink 集群
+        FLINK("-*\\s?flink\\s+(.*)", SINGLE_ARGS),
+
+        //  -p 3      并发
+        PARALLELISM("-*\\s?-p\\s+(\\d)", SINGLE_ARGS);
 
         public final Pattern pattern;
         public final Function<String[], Optional<String[]>> argExtractFun;

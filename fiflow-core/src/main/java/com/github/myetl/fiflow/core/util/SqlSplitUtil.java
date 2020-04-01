@@ -1,7 +1,10 @@
 package com.github.myetl.fiflow.core.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class SqlSplitUtil {
 
@@ -9,6 +12,7 @@ public class SqlSplitUtil {
 
     public static String trim(String sql) {
         sql = sql.replaceAll("--.*", "")
+                .replaceAll("##.*", "")
                 .replaceAll("\r\n", " ")
                 .replaceAll("\n", " ")
                 .replace("\t", " ").trim();
@@ -16,7 +20,7 @@ public class SqlSplitUtil {
     }
 
     /**
-     * 以; 把 sql 分隔成多行
+     * 以; 把 sql 分隔成多行, 忽略 -- 开始的注释
      * @param sqls
      * @return
      */
@@ -33,17 +37,39 @@ public class SqlSplitUtil {
      */
     public static List<String> splitIgnoreQuota(String str, char delimiter){
         List<String> tokensList = new ArrayList<>();
+        if(StringUtils.isEmpty(str)) return tokensList;
+
         boolean inQuotes = false;
         boolean inSingleQuotes = false;
         StringBuilder b = new StringBuilder();
-        for (char c : str.toCharArray()) {
+
+        boolean isCommet = false;
+        final char[] charArray = str.toCharArray();
+        final int charSize = charArray.length;
+        int index = -1;
+        for (char c : charArray) {
+            index++;
+            if('-' == c && index < charSize - 1 && charArray[index + 1] == '-'){
+                isCommet = true;
+            }else if('\n' == c){
+                b.append(" ");
+                if(isCommet){
+                    if(b.length() > 1)
+                        tokensList.add(b.toString());
+                    b = new StringBuilder();
+                    isCommet = false;
+                }
+                continue;
+            }
+
             if(c == delimiter){
                 if (inQuotes) {
                     b.append(c);
                 } else if(inSingleQuotes){
                     b.append(c);
                 }else {
-                    tokensList.add(b.toString());
+                    if(b.length() > 1)
+                        tokensList.add(b.toString());
                     b = new StringBuilder();
                 }
             }else if(c == '\"'){
@@ -57,9 +83,10 @@ public class SqlSplitUtil {
             }
         }
 
-        tokensList.add(b.toString());
+        if(b.length() > 1)
+            tokensList.add(b.toString());
 
-        return tokensList;
+        return tokensList.stream().filter(t -> StringUtils.isNotBlank(t)).collect(Collectors.toList());
     }
 
     /**

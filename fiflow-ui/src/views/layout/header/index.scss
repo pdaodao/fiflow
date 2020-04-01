@@ -1,0 +1,51 @@
+@import 'src/assets/styles/variables.scss';
+
+.layout-header{
+    position: fixed;
+    z-index: 10; 
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 40px;
+    background-color: $dark-bg;
+    color: $dark-color;
+    box-shadow: $shadow-down;
+    clear: both;
+    .logo{
+        display: inline-block;
+        vertical-align: top;
+        font-size: 26px;
+        color: $body-background;
+        .logo-main-titile {
+            font-size: 24px;
+            height: 40px;
+            line-height: 40px;
+            font-weight: bold;
+
+        }
+        .logo-sub-title {
+            font-size: 12px;
+            height: 40px;
+            line-height: 40px;
+            .logo-sub-title-main {
+                font-weight: bold;
+            }
+        }
+    }
+    .ivu-menu{
+        display: inline-block !important;
+        margin-left: 60px;
+        line-height: 39px !important;
+        height: 39px !important;
+        background-color: #313a4e !important;
+        font-size: $font-size-base;
+
+        .ivu-menu-item-active{
+            border-bottom: 2px solid #2d8cf0;
+            color:#FFF;
+        }
+    }
+}

@@ -1,0 +1,27 @@
+// Base
+$body-background        : #eee;
+$font-family            : "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+$code-family            : Consolas,Menlo,Courier,monospace;
+$title-color            : #17233d;
+$text-color             : #515a6e;
+$font-size-base         : 14px;
+$font-size-small        : 12px;
+$font-size-large        : 16px;
+$line-height-base       : 1.5;
+
+$dark-bg: #252a2f;
+$dark-bg-light: rgb(0, 33, 64);
+$dark-bg-dark: rgb(0, 12, 23);
+$dark-color: rgba(255, 255, 255, 0.8);
+$dark-selected-bg: rgb(24, 144, 255);
+$dark-selected-color: #ffffff;
+
+// Shadow
+$shadow-color           : rgba(0, 0, 0, .2);
+$shadow-base            : -1px 0 6px $shadow-color;
+$shadow-card            : 0 1px 1px 0 rgba(0,0,0,.1);
+$shadow-up              : 0 -1px 6px $shadow-color;
+$shadow-down            : 0 1px 6px $shadow-color;
+$shadow-left            : -1px 0 6px $shadow-color;
+$shadow-right           : 1px 0 6px $shadow-color;
+$shadow-inset           : inset 0 0 5px $shadow-color;

@@ -23,6 +23,14 @@
         <scala.version>2.11.7</scala.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.47</version>
+        </dependency>
+    </dependencies>
+
 
     <build>
         <plugins>

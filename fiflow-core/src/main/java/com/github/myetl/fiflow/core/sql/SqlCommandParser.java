@@ -18,10 +18,7 @@ public final class SqlCommandParser {
     public static Optional<SqlCommander> parse(String sql) {
         if(StringUtils.isEmpty(sql)) return Optional.empty();
         sql = sql.trim();
-        if (sql.endsWith(";")) {
-            sql = sql.substring(0, sql.length() - 1).trim();
-        }
-        final String sqlF = sql;
+
 
         for(final SqlCommander.SqlCommand cmd: SqlCommander.SqlCommand.values()){
            final Matcher matcher = cmd.pattern.matcher(sql);
@@ -31,7 +28,7 @@ public final class SqlCommandParser {
                    groups[i] = matcher.group(i + 1);
                }
                return cmd.argExtractFun.apply(groups)
-                       .map((args) -> new SqlCommander(sqlF, cmd, args));
+                       .map((args) -> new SqlCommander(cmd, args));
            }
         }
         return Optional.empty();

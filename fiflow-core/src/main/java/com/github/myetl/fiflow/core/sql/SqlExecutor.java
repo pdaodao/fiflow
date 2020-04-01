@@ -1,7 +1,7 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.frame.FlowContext;
-import com.github.myetl.fiflow.core.frame.FlowSession;
+import com.github.myetl.fiflow.core.frame.FiFlinkSession;
 
 import java.util.Optional;
 
@@ -11,62 +11,80 @@ import java.util.Optional;
 public final class SqlExecutor {
     // 一条待执行的 sql
     private final String sql;
-    private final FlowSession flowSession;
+    private final FiFlinkSession flowSession;
 
-    public SqlExecutor(String sql, FlowSession flowSession) {
+    public SqlExecutor(String sql, FiFlinkSession flowSession) {
         this.sql = sql;
         this.flowSession = flowSession;
     }
 
-    public void run(final FlowContext flowContext){
+    public SqlBuildContext run(final FlowContext flowContext){
        Optional<SqlCommander> sqlCommander =  SqlCommandParser.parse(sql);
        if(!sqlCommander.isPresent() ){
            flowContext.outMsg("invalid sql : %s", sql);
-           return;
+           return new SqlBuildContext(false);
        }
 
        SqlCommander cmd = sqlCommander.get();
 
        switch (cmd.command){
-           case HELP: callHelp(); break;
-           case SHOW_CATALOGS: callShowCatalogs(); break;
-           case SHOW_DATABASES: callShowDatabases(); break;
-           case SHOW_TABLES: callShowTables(); break;
-           case SOURCE: callSource(); break;
+           case HELP: return callHelp(flowContext);
+           case SHOW_CATALOGS: return callShowCatalogs();
+           case SHOW_DATABASES: return callShowDatabases();
+           case SHOW_TABLES: return callShowTables();
+           case SOURCE: return callSource();
 
-           case CREATE_TABLE: callCreateTable(cmd.args[0], flowContext); break;
-           case SELECT: callSelect(cmd.args[0], flowContext); break;
+           case CREATE_TABLE: return callCreateTable(cmd.args[0], flowContext);
+           case SELECT: return callSelect(cmd.args[0], flowContext);
+
+           case INSERT_INTO:
+           case INSERT_OVERWRITE: return callInsertInto(cmd.args[0], flowContext);
        }
+       return new SqlBuildContext(false);
     }
 
-    private void callCreateTable(final String sql, FlowContext flowContext) {
+    private SqlBuildContext callInsertInto(final String sql, FlowContext flowContext) {
+
+//        this.tbenv.getConfig().getConfiguration()
+//                .set(ExecutionConfigOptions.TABLE_EXEC_RESOURCE_DEFAULT_PARALLELISM,
+//                        Integer.parseInt(context.getLocalProperties().get("parallelism")));
+//
+//
         flowSession.tEnv.sqlUpdate(sql);
 
+        flowContext.outMsg("insert into.");
+        return new SqlBuildContext(true);
+    }
+
+    private SqlBuildContext callCreateTable(final String sql, FlowContext flowContext) {
+        flowSession.tEnv.sqlUpdate(sql);
         flowContext.outMsg("Table has been created.");
+        return new SqlBuildContext(true);
     }
 
-    private void callSelect(final String sql, FlowContext flowContext) {
-
+    private SqlBuildContext callSelect(final String sql, FlowContext flowContext) {
+        return new SqlBuildContext(true);
     }
 
-    private void callHelp(){
-
+    private SqlBuildContext callHelp(FlowContext flowContext){
+        flowContext.outMsg("fiflow run flink sql");
+        return new SqlBuildContext(false);
     }
 
-    private void callShowCatalogs(){
-
+    private SqlBuildContext callShowCatalogs(){
+        return new SqlBuildContext(false);
     }
 
-    private void callShowDatabases(){
-
+    private SqlBuildContext callShowDatabases(){
+        return new SqlBuildContext(false);
     }
 
-    private void callShowTables(){
-
+    private SqlBuildContext callShowTables(){
+        return new SqlBuildContext(false);
     }
 
-    private void callSource(){
-
+    private SqlBuildContext callSource(){
+        return new SqlBuildContext(false);
     }
 
 }

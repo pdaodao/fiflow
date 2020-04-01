@@ -1,0 +1,90 @@
+@import 'variables.scss';
+@import 'normalize.css';
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+body{
+    font-family: $font-family;
+    font-variant-numeric: tabular-nums;
+    font-size: $font-size-base;
+    color: $text-color;
+    line-height: $line-height-base;
+    background-color: $body-background;
+    overflow: hidden;
+}
+.layout-content {
+    height: 100%;
+}
+
+.layout-body{
+    width: 100%;
+    height: 100%;
+    padding: 40px 0 40px;
+}
+
+.ivu-message {
+  z-index: 2000 !important;
+}
+
+
+@media (min-width: 768px){
+    .container {
+        width: 768px;
+    }
+}
+
+@media (min-width: 992px){
+    .container {
+        width: 940px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        width: 1140px;
+    }
+}
+
+
+.container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+
+.inline-block{
+    display: inline-block; 
+}
+
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+::-webkit-scrollbar
+{
+    width: 5px;
+    height: 60px; 
+    background-color: #F5F5F5;
+}
+ 
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar-track
+{
+    border-radius: 5px;
+    background-color: #F5F5F5;
+}
+ 
+/*定义滑块 内阴影+圆角*/
+::-webkit-scrollbar-thumb
+{
+    border-radius: 5px;
+    height: 60px;
+    background-color: #555;
+}
