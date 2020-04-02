@@ -35,17 +35,12 @@
             }
         }
     }
-    .ivu-menu{
+    .el-menu{
         display: inline-block !important;
         margin-left: 60px;
-        line-height: 39px !important;
-        height: 39px !important;
-        background-color: #313a4e !important;
-        font-size: $font-size-base;
-
-        .ivu-menu-item-active{
-            border-bottom: 2px solid #2d8cf0;
-            color:#FFF;
+        .el-menu-item, .el-submenu, .el-submenu__title{
+            line-height: 39px !important;
+            height: 39px !important;
         }
     }
 }

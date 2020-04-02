@@ -11,11 +11,12 @@ public class FiflowRuntimeLoader {
 
     /**
      * 获取 fiflow 运行时
+     *
      * @return
      */
-    public static FiflowRuntime getRuntime(){
+    public static FiflowRuntime getRuntime() {
         ServiceLoader<FiflowRuntime> runtime = ServiceLoader.load(FiflowRuntime.class);
-        if(!runtime.iterator().hasNext()){
+        if (!runtime.iterator().hasNext()) {
             throw new RuntimeException("no fiflow runtime provided.");
         }
         return runtime.iterator().next();

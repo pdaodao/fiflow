@@ -10,41 +10,39 @@
         </span>
       </div>
 
-      <Menu mode="horizontal"
-            theme="dark"
-            :active-name="active">
+      <el-menu :default-active="active"
+               router
+               background-color="#545c64"
+               text-color="#f3f3f3"
+               active-text-color="#2d8cf0"
+               mode="horizontal">
 
         <li v-for="item of routes"
-            :name="item.name"
+            :index="item.name"
             :key="item.name"
-            :to="item"
-            :is="item.children ? 'Submenu' :'MenuItem'">
+            :is="item.children ? 'el-submenu' :'el-menu-item'">
 
-          <template v-if="item.children">
-            <template slot="title">
-              <Icon v-if="item.meta.icon"
-                    :type="item.meta.icon" />
-              {{item.meta.title}}
-            </template>
+          <template v-if="item.children"
+                    slot="title">
+            <i v-if='item.meta.icon'
+               :class="'el-icon-'+item.meta.icon" />{{item.meta.title}}
           </template>
           <template v-else>
-            <Icon v-if="item.meta.icon"
-                  :type="item.meta.icon" />
-            {{item.meta.title}}
+            <i v-if='item.meta.icon'
+               :class="'el-icon-'+item.meta.icon" />{{item.meta.title}}
           </template>
 
-          <MenuItem v-for="sub of item.children"
-                    :name="sub.name"
-                    :to="sub"
-                    :key="sub.name">
-          <Icon v-if="sub.meta.icon"
-                :type="sub.meta.icon" />
-          {{sub.meta.title}}
-          </MenuItem>
-
+          <el-menu-item v-for="sub of item.children"
+                        :index="sub.name"
+                        :key="sub.name">
+            <i v-if="sub.meta.icon"
+               :class="'el-icon-'+sub.meta.icon" />
+            {{sub.meta.title}}
+          </el-menu-item>
         </li>
 
-      </Menu>
+      </el-menu>
+
     </div>
   </div>
 </template>
@@ -59,9 +57,7 @@ export default {
   },
   mounted () {
     this.routes = this.$router.options.routes[0].children
-    console.log("routes", this.routes)
-    const name = this.$route.name
-    this.active = name
+    this.active = this.$route.name
   },
   methods: {
 

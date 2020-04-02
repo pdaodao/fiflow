@@ -2,10 +2,15 @@ package com.github.myetl.fiflow.core.core;
 
 import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.frame.SessionConfig;
+import com.github.myetl.fiflow.core.sql.SqlBuildResult;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.TableEnvironment;
 import org.apache.flink.table.api.java.StreamTableEnvironment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 核心 入口
@@ -19,7 +24,11 @@ public abstract class FiflowSession {
     public EnvironmentSettings settings;
     public TableEnvironment tEnv;
 
+    private List<String> jars = new ArrayList<>();
+
     public FlinkClusterInfo flinkClusterInfo;
+
+    private int step = 0;
 
     public FiflowSession(String id, SessionConfig sessionConfig) {
         this.id = id;
@@ -29,7 +38,7 @@ public abstract class FiflowSession {
     }
 
     private void init() {
-        if(env != null) return;
+        if (env != null) return;
 
         env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(sessionConfig.parallelism);
@@ -37,9 +46,9 @@ public abstract class FiflowSession {
         EnvironmentSettings.Builder settingBuilder = EnvironmentSettings
                 .newInstance()
                 .useBlinkPlanner();
-        if(sessionConfig.streamingMode){
+        if (sessionConfig.streamingMode) {
             settingBuilder.inStreamingMode();
-        }else {
+        } else {
             settingBuilder.inBatchMode();
         }
         settings = settingBuilder.build();
@@ -49,12 +58,26 @@ public abstract class FiflowSession {
 
     /**
      * 执行sql
-     * @param sqlText  多行以;分隔的sql语句
+     *
+     * @param sqlText 多行以;分隔的sql语句
      */
-    abstract void sql(String sqlText);
+    public abstract SqlBuildResult sql(String sqlText);
+
+    public void addJar(String jarName){
+        if(StringUtils.isNotEmpty(jarName))
+            jars.add(jarName);
+    }
+
+    public List<String> getJars() {
+        return jars;
+    }
 
     /**
      * 关闭该 session
      */
-    abstract void close();
+    public abstract void close();
+
+    public String getName(){
+        return id+"-"+step++;
+    }
 }

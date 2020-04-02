@@ -13,21 +13,21 @@ const router = new VueRouter({
             children: [
                 {
                     path: 'sql',
-                    name: 'sql',
+                    name: '/sql',
                     meta: {
                         title: 'fisql',
                         keepAlive: true, // 需要被缓存
-                        icon: 'ios-at'
+                        icon: 'medal'
                     },
                     component: () => import('./views/fisql/index.vue'),
                 },
                 {
                     path: 'flow',
-                    name: 'flow',
+                    name: '/flow',
                     meta: {
                         title: '数据流',
                         keepAlive: true, // 需要被缓存
-                        icon: 'md-analytics'
+                        icon: 'ship'
                     },
                     component: () => import('./views/flow/index.vue'),
                 },
@@ -36,34 +36,34 @@ const router = new VueRouter({
                     name: 'config',
                     meta: {
                         title: '管理',
-                        icon: 'ios-construct'
+                        icon: 'setting'
                     },
                     component: () => import('./views/config/index.vue'),
                     children: [{
-                        name: 'flink',
+                        name: '/config/flink',
                         path: 'flink',
                         component: () => import('./views/flink/index.vue'),
                         meta: {
                             title: 'flink集群',
-                            icon: 'md-cloud-outline'
+                            icon: 's-promotion'
                         }
                     },
                     {
-                        name: 'datasource',
+                        name: '/config/datasource',
                         path: 'datasource',
                         component: () => import('./views/datasource/index.vue'),
                         meta: {
                             title: '数据源',
-                            icon: 'ios-flower'
+                            icon: 'coin'
                         }
                     },
                     {
-                        name: 'monitor',
+                        name: '/config/monitor',
                         path: 'monitor',
-                        component: () => import('./views/flink/index.vue'),
+                        component: () => import('./views/monitor/index.vue'),
                         meta: {
                             title: '监控',
-                            icon: 'ios-help-buoy'
+                            icon: 'attract'
                         }
                     }
                     ]
@@ -73,15 +73,13 @@ const router = new VueRouter({
     ],
 });
 router.beforeEach((to, from, next) => {
-    // console.log(to, from)
     next()
 })
 
 router.afterEach((to) => {
     // console.log(from)
-    console.log('访问：', to.fullPath);
     if (to.meta) {
-        document.title = to.meta.title || 'fiflow';
+        document.title = to.meta.title || 'fiflow'
     }
 })
 

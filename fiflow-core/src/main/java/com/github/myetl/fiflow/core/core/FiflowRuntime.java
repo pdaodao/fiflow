@@ -1,6 +1,5 @@
 package com.github.myetl.fiflow.core.core;
 
-import com.github.myetl.fiflow.core.frame.FiFlinkSession;
 import com.github.myetl.fiflow.core.frame.JobSubmitResult;
 
 /**
@@ -10,9 +9,10 @@ public interface FiflowRuntime {
 
     /**
      * 提交任务  这里只返回任务id 任务状态什么的单独获取
+     *
      * @param flowSession
      * @return
      * @throws Exception
      */
-    JobSubmitResult submit(FiFlinkSession flowSession) throws Exception;
+    JobSubmitResult submit(FiflowSession flowSession) throws Exception;
 }

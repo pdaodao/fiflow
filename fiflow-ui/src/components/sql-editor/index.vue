@@ -13,7 +13,7 @@ export default {
       sqlEditor: null,
       height: 36,
       lineHeight: 18,
-      maxHeight: 300,
+      maxHeight: null,
     }
   },
   beforeMount () {
@@ -37,16 +37,21 @@ export default {
       })
       const that = this
       this.sqlEditor.onDidChangeModelContent(function () {
-        const pos = that.sqlEditor.getPosition()
-        const line = pos.lineNumber + 1
-        if (line > 2) {
-          let h = line * that.lineHeight + 20
-          if (h > that.maxHeight) h = that.maxHeight
-          that.height = h
-        }
         that.$emit("input", that.sqlEditor.getValue())
+        that.adjustHeight()
       })
     },
+    adjustHeight () {
+      this.$nextTick(function () {
+        const pos = this.sqlEditor.getPosition()
+        const line = pos.lineNumber + 1
+        if (line > 2) {
+          let h = line * this.lineHeight + 10
+          if (this.maxHeight != null && this.maxHeight > 100 && h > this.maxHeight) h = this.maxHeight
+          this.height = h
+        }
+      })
+    }
   },
   beforeDestroy () {
     this.sqlEditor.dispose()

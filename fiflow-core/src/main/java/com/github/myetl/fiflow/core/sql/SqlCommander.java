@@ -11,16 +11,33 @@ import java.util.regex.Pattern;
 /**
  * sql 命令 和 参数
  */
-public final class SqlCommander{
+public final class SqlCommander {
 
+    // 不需要参数
+    private static final Function<String[], Optional<String[]>> NO_ARGS =
+            (args) -> Optional.of(new String[0]);
+    // 一个参数
+    private static final Function<String[], Optional<String[]>> SINGLE_ARGS =
+            (args) -> Optional.of(new String[]{args[0]});
+    // 两个参数
+    private static final Function<String[], Optional<String[]>> TWO_ARGS = new Function<String[], Optional<String[]>>() {
+        @Override
+        public Optional<String[]> apply(String[] args) {
+            if (args.length < 2) {
+                return Optional.empty();
+            }
+            return Optional.of(new String[]{args[0], args[1]});
+        }
+    };
+    // 忽略大小写
+    private static final int DEFAULT_PATTERN_FLAGS = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
     public final SqlCommand command;
     public final String[] args;
 
-    public SqlCommander(SqlCommand  sqlCommand, String[] args) {
+    public SqlCommander(SqlCommand sqlCommand, String[] args) {
         this.command = sqlCommand;
         this.args = args;
     }
-
 
     @Override
     public boolean equals(Object o) {
@@ -46,28 +63,8 @@ public final class SqlCommander{
 
     @Override
     public String toString() {
-        return command+"("+ Arrays.toString(args)+")";
+        return command + "(" + Arrays.toString(args) + ")";
     }
-
-    // 不需要参数
-    private static final Function<String[], Optional<String[]>> NO_ARGS =
-            (args) -> Optional.of(new String[0]);
-
-    // 一个参数
-    private static final Function<String[], Optional<String[]>> SINGLE_ARGS =
-            (args) -> Optional.of(new String[]{args[0]});
-    // 两个参数
-    private static final Function<String[], Optional<String[]>> TWO_ARGS = new Function<String[], Optional<String[]>>() {
-        @Override
-        public Optional<String[]> apply(String[] args) {
-            if (args.length < 2) {
-                return Optional.empty();
-            }
-            return Optional.of(new String[]{args[0], args[1]});
-        }
-    };
-    // 忽略大小写
-    private static final int DEFAULT_PATTERN_FLAGS = Pattern.CASE_INSENSITIVE | Pattern.DOTALL;
 
 
     public enum SqlCommand {
@@ -158,7 +155,7 @@ public final class SqlCommander{
             return super.toString().replace('_', ' ');
         }
 
-        public boolean needArg(){
+        public boolean needArg() {
             return this.argExtractFun != NO_ARGS;
         }
     }

@@ -4,11 +4,10 @@
     <layout-header />
 
     <div class="layout-main">
-      <keep-alive v-if="$route.meta.keepAlive">
+      <keep-alive>
         <router-view :key="$route.path" />
       </keep-alive>
-
-      <router-view v-if="!$route.meta.keepAlive " />
+      <!-- <router-view v-if="!$route.meta.keepAlive " /> -->
     </div>
 
   </div>

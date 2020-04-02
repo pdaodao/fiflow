@@ -4,20 +4,11 @@
     <div class="maintoolbar">
       <div class="container">
         <div class="toolbar">
-          <Button size="small">保存</Button>
-
-          <Button icon="md-add"
-                  size="small"
-                  @click="add">
-            添加
-          </Button>
-
-          <Button icon="ios-play"
-                  @click="run"
-                  size="small">
-            运行
-          </Button>
-
+          <el-button icon="el-icon-document"> 保存</el-button>
+          <el-button @click="add"
+                     icon="el-icon-plus">添加</el-button>
+          <el-button @click="run"
+                     icon="el-icon-video-play">运行</el-button>
         </div>
       </div>
     </div>
@@ -82,11 +73,12 @@ export default {
         console.log(block)
         block.runSql()
       } else {
-        this.$Notice.warning({
-          title: '执行失败',
-          desc: '请选择需要执行的sql',
-          duration: 10,
-        });
+        this.$notify({
+          title: '无法执行',
+          type: 'warning',
+          message: '请选择需要执行的sql',
+          duration: 10
+        })
       }
     }
   }

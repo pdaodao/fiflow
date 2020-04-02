@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Message } from 'view-design'
+import { Message } from 'element-ui'
 
 
 const instance = axios.create({
@@ -25,7 +25,7 @@ instance.interceptors.response.use(
     },
     error => {
         let message = error.message
-        Message.error(message || '后台接口异常，请联系开发处理！');
+        Message.error({ message: message || '后台接口异常，请联系开发处理！' })
     }
 )
 

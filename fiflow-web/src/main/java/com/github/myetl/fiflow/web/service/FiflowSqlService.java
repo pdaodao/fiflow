@@ -1,10 +1,8 @@
 package com.github.myetl.fiflow.web.service;
 
-import com.github.myetl.fiflow.core.frame.FiFlinkSession;
-import com.github.myetl.fiflow.core.sql.SqlBuildContext;
-import com.github.myetl.fiflow.runtime.FiflowFlinkExecutor;
+import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.sql.SqlBuildResult;
 import com.github.myetl.fiflow.web.model.SqlCmd;
-import com.github.myetl.fiflow.web.model.SqlExecuteResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,24 +16,30 @@ public class FiflowSqlService {
 
     /**
      * todo
+     *
      * @param cmd
      * @throws Exception
      */
-    public SqlExecuteResult run(SqlCmd cmd) throws Exception{
-        FiFlinkSession session = fiflowService.getOrCreateSession(cmd.getSessionId());
+    public SqlBuildResult run(SqlCmd cmd) throws Exception {
+        FiflowSqlSession session = fiflowService.getOrCreateSession(cmd.getSessionId());
 
-        SqlBuildContext sqlBuildContext = session.sql(cmd.getSql());
+        SqlBuildResult buildResult = session.sql(cmd.getSql());
 
-        System.out.println("session id:"+session.getId());
+        buildResult.setSessionId(session.id);
 
-        if(sqlBuildContext.needExecute){
-//            FiflowRunner.executeLocal(session);
-            FiflowFlinkExecutor.executeStandalone(session, null);
+        switch (buildResult.getLevel()) {
+            case Select: ;
+            case Insert: {
+                // 提交执行
+                String jobId = fiflowService.execute(session);
+                buildResult.addMsg("submit job :"+jobId);
+                buildResult.setJobId(jobId);
+                break;
+            }
+            default:
+                break;
         }
-        SqlExecuteResult ret = new SqlExecuteResult();
-        ret.setSessionId(session.getId());
-
-        return ret;
+        return buildResult;
     }
 
 }
