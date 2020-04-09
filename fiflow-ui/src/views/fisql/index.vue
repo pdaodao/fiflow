@@ -66,6 +66,7 @@ export default {
       }
       if (this.line == 1) {
         item.sql = "help"
+        this.currentId = item.id
       }
       this.sqlList.push(item)
     },
@@ -80,7 +81,7 @@ export default {
           title: '无法执行',
           type: 'warning',
           message: '请选择需要执行的sql',
-          duration: 10
+          duration: 90
         })
       }
     }

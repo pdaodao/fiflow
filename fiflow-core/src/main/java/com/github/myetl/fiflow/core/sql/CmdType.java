@@ -1,6 +1,7 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.sql.builder.*;
+import com.github.myetl.fiflow.core.sql.builder.demo.DemoMysql;
 import com.github.myetl.fiflow.core.sql.builder.frame.*;
 import com.github.myetl.fiflow.core.sql.builder.system.*;
 
@@ -9,6 +10,7 @@ import com.github.myetl.fiflow.core.sql.builder.system.*;
  */
 public enum CmdType {
     Help(new HelpBuilder()),
+    DemoMysql(new DemoMysql()),
     Jar(new JarBuilder()),
     Parallelism(new ParallelismBuilder()),
     Flink(new FlinkBuilder()),
@@ -27,11 +29,10 @@ public enum CmdType {
 
     // frame
     Set(new SetBuilder()),
-    Source(new SourceBuilder()),
     Udf(new UdfBuilder()),
 
     // system
-    Clear(new ClearBuilder()),
+//    Clear(new ClearBuilder()),
     Describe(new DescribeBuilder()),
     Explain(new ExplainBuilder()),
     Quit(new QuitBuilder()),
@@ -42,9 +43,6 @@ public enum CmdType {
     ShowTables(new ShowTablesBuilder()),
     Use(new UseBuilder()),
     UseCatalog(new UseCatalogBuilder());
-
-
-
 
 
     public final CmdBuilder cmdBuilder;

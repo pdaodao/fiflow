@@ -9,6 +9,11 @@
                        :prop="column.prop"
                        :key="column.prop"
                        :label="column.label">
+
+        <template slot-scope="scope">
+          <span v-html="scope.row[column.prop]" />
+        </template>
+
       </el-table-column>
 
     </el-table>
@@ -56,7 +61,7 @@ export default {
           index = 0;
           const r = {}
           for (const v of row) {
-            r['p' + index++] = v
+            r['p' + index++] = v.replace(/\n/gm, "<br/>")
           }
           this.tableData.push(r)
         }

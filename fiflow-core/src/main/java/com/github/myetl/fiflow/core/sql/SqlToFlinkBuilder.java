@@ -20,7 +20,7 @@ public class SqlToFlinkBuilder {
      * @throws Exception
      */
     public static CmdBuildInfo build(String sql, FiflowSqlSession fiflowSqlSession) throws Exception {
-        if(StringUtils.isEmpty(sql))
+        if (StringUtils.isEmpty(sql))
             return new CmdBuildInfo(BuildLevel.None);
         sql = sql.trim();
         for (CmdType cmdType : CmdType.values()) {

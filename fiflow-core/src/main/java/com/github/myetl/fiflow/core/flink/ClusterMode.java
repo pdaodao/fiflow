@@ -6,6 +6,6 @@ package com.github.myetl.fiflow.core.flink;
 public enum ClusterMode {
     local,
     standalone,
-    peryarn,
-    yarn
+    yarn,
+    yarnper
 }

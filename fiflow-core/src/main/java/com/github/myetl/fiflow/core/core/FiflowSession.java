@@ -24,6 +24,7 @@ public abstract class FiflowSession {
     public EnvironmentSettings settings;
     public TableEnvironment tEnv;
     public FlinkClusterInfo flinkClusterInfo;
+    public volatile Boolean closed = false;
     private List<String> jars = new ArrayList<>();
     private int step = 0;
 
@@ -72,7 +73,10 @@ public abstract class FiflowSession {
     /**
      * 关闭该 session
      */
-    public abstract void close();
+    public synchronized void close() {
+        this.closed = true;
+
+    }
 
     public String getName() {
         return id + "-" + step++;

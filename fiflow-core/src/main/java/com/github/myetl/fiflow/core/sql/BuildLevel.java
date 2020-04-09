@@ -17,6 +17,7 @@ public enum BuildLevel {
 
     Error(6);    // 错误
 
+
     public final Integer level;
 
     BuildLevel(Integer level) {

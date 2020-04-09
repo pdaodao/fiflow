@@ -29,6 +29,11 @@ public final class FlowSessionManager {
             }
         }
         SessionWrap wrap = sessionMap.get(id);
+        if (wrap != null && wrap.session.closed) {
+            sessionMap.remove(id);
+            wrap = null;
+        }
+
         if (wrap == null) {
             FiflowSqlSession flowSession = new FiflowSqlSession(id, sessionConfig);
             wrap = new SessionWrap(flowSession);

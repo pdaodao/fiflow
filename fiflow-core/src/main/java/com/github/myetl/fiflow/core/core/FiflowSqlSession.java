@@ -40,9 +40,4 @@ public class FiflowSqlSession extends FiflowSession {
         }
         return buildResult;
     }
-
-    @Override
-    public void close() {
-
-    }
 }

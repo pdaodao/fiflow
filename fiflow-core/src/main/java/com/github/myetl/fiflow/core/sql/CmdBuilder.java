@@ -1,7 +1,6 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -32,9 +31,10 @@ public interface CmdBuilder {
 
     /**
      * 帮助信息
-     * @return  使用;分隔为两部分
+     *
+     * @return 使用;分隔为两部分
      */
-    default String help(){
+    default String help() {
         String name = this.getClass().getSimpleName()
                 .replace("Builder", "")
                 .toLowerCase();

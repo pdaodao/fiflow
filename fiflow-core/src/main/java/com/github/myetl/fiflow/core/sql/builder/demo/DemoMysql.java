@@ -1,4 +1,4 @@
-package com.github.myetl.fiflow.core.sql.builder.system;
+package com.github.myetl.fiflow.core.sql.builder.demo;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.sql.BuildLevel;
@@ -7,27 +7,26 @@ import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 
-/**
- * show modules
- */
-public class ShowModulesBuilder extends CmdBaseBuilder implements CmdBuilder {
-    public static final String pattern = "SHOW\\s+MODULES";
+public class DemoMysql extends CmdBaseBuilder implements CmdBuilder {
+    public static final String pattern = "demo\\s+mysql\\s?";
 
-    public ShowModulesBuilder() {
+    public DemoMysql() {
         super(pattern);
     }
 
     @Override
     public String help() {
-        return "show modules; gets an array of names of all modules in this environment in the loaded order";
+        return "demo mysql; jdbc simple demo";
     }
 
     @Override
     public CmdBuildInfo build(Cmd cmd, FiflowSqlSession session) {
         CmdBuildInfo result = new CmdBuildInfo(BuildLevel.Show);
-        result.table().addHeads("module name");
-        for (String t : session.tEnv.listModules()) {
-            result.table().addRow(t);
+        result.table().addHeads("jdbc simple demo");
+        try {
+            result.table().addRow(readText("demo-mysql.txt"));
+        } catch (Exception e) {
+            result.addMsg(e.getMessage());
         }
         return result;
     }

@@ -61,6 +61,14 @@ public class CmdBuildInfo implements Serializable {
         return this;
     }
 
+    public TableData table() {
+        if (table == null) {
+            table = TableData.instance();
+        }
+        return table;
+    }
+
+
     public List<String> getMsgs() {
         return msgs;
     }

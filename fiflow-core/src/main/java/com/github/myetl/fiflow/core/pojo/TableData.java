@@ -40,6 +40,10 @@ public class TableData implements Serializable {
         rows.add(row);
     }
 
+    public void addRow(String... rowValues) {
+        this.addRow(TableRow.of(rowValues));
+    }
+
     public List<String> getHeads() {
         return heads;
     }

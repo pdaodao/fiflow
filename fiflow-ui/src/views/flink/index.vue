@@ -71,11 +71,11 @@
                          value="local"></el-option>
               <el-option label="standalone"
                          value="standalone"></el-option>
-              <el-option label="yarn"
+              <el-option label="yarn todo"
                          value="yarn"></el-option>
-              <el-option label="peryarn"
-                         value="peryarn"></el-option>
-              <el-option label="k8s"
+              <el-option label="yarnper todo"
+                         value="yarnper"></el-option>
+              <el-option label="k8s todo"
                          value="k8s"></el-option>
             </el-select>
           </el-form-item>

@@ -1,10 +1,19 @@
 package com.github.myetl.fiflow.core.sql.builder.system;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.sql.BuildLevel;
 import com.github.myetl.fiflow.core.sql.Cmd;
-import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
+import com.github.myetl.fiflow.core.util.StrUtils;
+import org.apache.flink.table.api.Table;
+import org.apache.flink.table.api.TableSchema;
+import org.apache.flink.table.api.constraints.UniqueConstraint;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * describe xx
@@ -17,7 +26,45 @@ public class DescribeBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
+    public String help() {
+        return "describe xx; show table schema";
+    }
+
+    @Override
     public CmdBuildInfo build(Cmd cmd, FiflowSqlSession session) {
-        return null;
+        final String tableName = cmd.args[0];
+
+        CmdBuildInfo result = new CmdBuildInfo(BuildLevel.Show);
+
+        Table table = session.tEnv.from(tableName);
+        if (table == null) {
+            result = new CmdBuildInfo(BuildLevel.Error);
+            result.addMsg("table not exist " + tableName);
+            return result;
+        }
+
+        result.table().addHeads("field", "type", "primary key");
+
+        TableSchema tableSchema = table.getSchema();
+        Map<String, String> pkFieldMap = new HashMap<>();
+
+        Optional<UniqueConstraint> pks = tableSchema.getPrimaryKey();
+        if (pks.isPresent()) {
+            UniqueConstraint pk = pks.get();
+            for (String t : pk.getColumns()) {
+                pkFieldMap.put(t, pk.getType().name());
+            }
+        }
+
+        for (int i = 0; i < tableSchema.getFieldCount(); i++) {
+            String f = StrUtils.toString(tableSchema.getFieldName(i));
+            String k = "";
+            if (pkFieldMap.containsKey(f)) {
+                k = pkFieldMap.get(f);
+            }
+            result.table().addRow(f, StrUtils.toString(tableSchema.getFieldDataType(i)), k);
+        }
+
+        return result;
     }
 }
