@@ -1,0 +1,55 @@
+package com.github.myetl.fiflow.core.sql;
+
+import com.github.myetl.fiflow.core.sql.builder.*;
+import com.github.myetl.fiflow.core.sql.builder.frame.*;
+import com.github.myetl.fiflow.core.sql.builder.system.*;
+
+/**
+ * sql command 类型
+ */
+public enum CmdType {
+    Help(new HelpBuilder()),
+    Jar(new JarBuilder()),
+    Parallelism(new ParallelismBuilder()),
+    Flink(new FlinkBuilder()),
+    CreateTable(new CreateTableBuilder()),
+    Select(new SelectBuilder()),
+    InsertInto(new InsertIntoBuilder()),
+    InsertOverwrite(new InsertOverwriteBuilder()),
+
+    DropTable(new DropTableBuilder()),
+    CreateView(new CreateViewBuilder()),
+    DropView(new DropViewBuilder()),
+    AlterDatabase(new AlterDatabaseBuilder()),
+    CreateDatabase(new CreateDatabaseBuilder()),
+    DropDatabase(new DropDatabaseBuilder()),
+
+
+    // frame
+    Set(new SetBuilder()),
+    Source(new SourceBuilder()),
+    Udf(new UdfBuilder()),
+
+    // system
+    Clear(new ClearBuilder()),
+    Describe(new DescribeBuilder()),
+    Explain(new ExplainBuilder()),
+    Quit(new QuitBuilder()),
+    ShowCatalogs(new ShowCatalogsBuilder()),
+    ShowDatabases(new ShowDatabasesBuilder()),
+    ShowFunctions(new ShowFunctionsBuilder()),
+    ShowModules(new ShowModulesBuilder()),
+    ShowTables(new ShowTablesBuilder()),
+    Use(new UseBuilder()),
+    UseCatalog(new UseCatalogBuilder());
+
+
+
+
+
+    public final CmdBuilder cmdBuilder;
+
+    CmdType(CmdBuilder cmdBuilder) {
+        this.cmdBuilder = cmdBuilder;
+    }
+}

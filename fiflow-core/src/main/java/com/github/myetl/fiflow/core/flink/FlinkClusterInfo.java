@@ -14,7 +14,7 @@ public class FlinkClusterInfo implements Serializable {
     private Integer port = 8081;
 
     // 集群模式
-    private FlinkMode mode = FlinkMode.yarn;
+    private ClusterMode mode = ClusterMode.yarn;
 
     public String getCode() {
         return code;
@@ -43,11 +43,11 @@ public class FlinkClusterInfo implements Serializable {
         return this;
     }
 
-    public FlinkMode getMode() {
+    public ClusterMode getMode() {
         return mode;
     }
 
-    public FlinkClusterInfo setMode(FlinkMode mode) {
+    public FlinkClusterInfo setMode(ClusterMode mode) {
         this.mode = mode;
         return this;
     }

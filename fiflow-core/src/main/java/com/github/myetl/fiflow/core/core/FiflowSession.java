@@ -2,7 +2,7 @@ package com.github.myetl.fiflow.core.core;
 
 import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.frame.SessionConfig;
-import com.github.myetl.fiflow.core.sql.SqlBuildResult;
+import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -23,11 +23,8 @@ public abstract class FiflowSession {
     public StreamExecutionEnvironment env;
     public EnvironmentSettings settings;
     public TableEnvironment tEnv;
-
-    private List<String> jars = new ArrayList<>();
-
     public FlinkClusterInfo flinkClusterInfo;
-
+    private List<String> jars = new ArrayList<>();
     private int step = 0;
 
     public FiflowSession(String id, SessionConfig sessionConfig) {
@@ -61,10 +58,10 @@ public abstract class FiflowSession {
      *
      * @param sqlText 多行以;分隔的sql语句
      */
-    public abstract SqlBuildResult sql(String sqlText);
+    public abstract CmdBuildInfo sql(String sqlText);
 
-    public void addJar(String jarName){
-        if(StringUtils.isNotEmpty(jarName))
+    public void addJar(String jarName) {
+        if (StringUtils.isNotEmpty(jarName))
             jars.add(jarName);
     }
 
@@ -77,7 +74,7 @@ public abstract class FiflowSession {
      */
     public abstract void close();
 
-    public String getName(){
-        return id+"-"+step++;
+    public String getName() {
+        return id + "-" + step++;
     }
 }

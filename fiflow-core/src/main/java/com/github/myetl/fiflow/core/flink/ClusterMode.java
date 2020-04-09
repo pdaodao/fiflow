@@ -1,6 +1,9 @@
 package com.github.myetl.fiflow.core.flink;
 
-public enum FlinkMode {
+/**
+ * 集群模式
+ */
+public enum ClusterMode {
     local,
     standalone,
     peryarn,

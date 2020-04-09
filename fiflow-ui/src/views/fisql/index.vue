@@ -64,6 +64,9 @@ export default {
         id: this.line++,
         sql: '',
       }
+      if (this.line == 1) {
+        item.sql = "help"
+      }
       this.sqlList.push(item)
     },
     run () {

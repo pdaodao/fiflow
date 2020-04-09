@@ -1,7 +1,7 @@
 package com.github.myetl.fiflow.web.service;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
-import com.github.myetl.fiflow.core.sql.SqlBuildResult;
+import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
 import com.github.myetl.fiflow.web.model.SqlCmd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,10 @@ public class FiflowSqlService {
      * @param cmd
      * @throws Exception
      */
-    public SqlBuildResult run(SqlCmd cmd) throws Exception {
+    public CmdBuildInfo run(SqlCmd cmd) throws Exception {
         FiflowSqlSession session = fiflowService.getOrCreateSession(cmd.getSessionId());
 
-        SqlBuildResult buildResult = session.sql(cmd.getSql());
+        CmdBuildInfo buildResult = session.sql(cmd.getSql());
 
         buildResult.setSessionId(session.id);
 

@@ -1,4 +1,4 @@
-package com.github.myetl.fiflow.core.sql;
+package com.github.myetl.fiflow.core.pojo;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.annotation.JsonInclude;

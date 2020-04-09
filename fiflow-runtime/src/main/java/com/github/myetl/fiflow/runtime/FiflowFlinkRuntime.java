@@ -3,6 +3,7 @@ package com.github.myetl.fiflow.runtime;
 import com.github.myetl.fiflow.core.core.FiflowRuntime;
 import com.github.myetl.fiflow.core.core.FiflowSession;
 import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
+import com.github.myetl.fiflow.core.flink.ClusterMode;
 import com.github.myetl.fiflow.core.frame.JobSubmitResult;
 import com.github.myetl.fiflow.core.util.JarUtils;
 import com.github.myetl.fiflow.core.util.Preconditions;
@@ -26,7 +27,11 @@ public class FiflowFlinkRuntime implements FiflowRuntime {
 
         // todo
         // 由于集群管理还没做完 这里先在代码里写一个standalone的连接信息
-        FlinkClusterInfo flinkClusterInfo =  ClientInfoTest.info();
+//        FlinkClusterInfo flinkClusterInfo =  ClientInfoTest.info();
+
+        FlinkClusterInfo flinkClusterInfo = new FlinkClusterInfo();
+        flinkClusterInfo.setMode(ClusterMode.local);
+        flinkClusterInfo.setCode("local1");
 
         ClusterClient client = ClientManager.getClient(flinkClusterInfo);
 

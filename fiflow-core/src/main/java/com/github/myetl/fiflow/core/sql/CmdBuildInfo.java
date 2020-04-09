@@ -1,5 +1,6 @@
 package com.github.myetl.fiflow.core.sql;
 
+import com.github.myetl.fiflow.core.pojo.TableData;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * 单条 sql 解析执行后的结果
  */
-public class SqlBuildResult implements Serializable {
+public class CmdBuildInfo implements Serializable {
     // 构建级别
     private final BuildLevel level;
     // 任务id
@@ -22,24 +23,24 @@ public class SqlBuildResult implements Serializable {
     // session id
     private String sessionId;
 
-    public SqlBuildResult(BuildLevel level) {
+    public CmdBuildInfo(BuildLevel level) {
         this.level = level;
     }
 
-    public static SqlBuildResult of(BuildLevel level, TableData rowSet) {
-        SqlBuildResult r = new SqlBuildResult(level);
+    public static CmdBuildInfo of(BuildLevel level, TableData rowSet) {
+        CmdBuildInfo r = new CmdBuildInfo(level);
         r.setTable(rowSet);
         return r;
     }
 
-    public SqlBuildResult addMsg(String msg) {
+    public CmdBuildInfo addMsg(String msg) {
         if (StringUtils.isEmpty(msg)) return this;
         if (msgs == null) msgs = new ArrayList<>();
         msgs.add(msg);
         return this;
     }
 
-    public SqlBuildResult addAllMsg(List<String> msg) {
+    public CmdBuildInfo addAllMsg(List<String> msg) {
         if (msg == null) return this;
         if (msgs == null) msgs = new ArrayList<>();
         msgs.addAll(msg);
@@ -54,7 +55,7 @@ public class SqlBuildResult implements Serializable {
         return table;
     }
 
-    public SqlBuildResult setTable(TableData table) {
+    public CmdBuildInfo setTable(TableData table) {
         if (table == null) return this;
         this.table = table;
         return this;
@@ -64,7 +65,7 @@ public class SqlBuildResult implements Serializable {
         return msgs;
     }
 
-    public SqlBuildResult setMsgs(List<String> msgs) {
+    public CmdBuildInfo setMsgs(List<String> msgs) {
         this.msgs = msgs;
         return this;
     }
@@ -73,7 +74,7 @@ public class SqlBuildResult implements Serializable {
         return jobId;
     }
 
-    public SqlBuildResult setJobId(String jobId) {
+    public CmdBuildInfo setJobId(String jobId) {
         this.jobId = jobId;
         return this;
     }
@@ -96,7 +97,7 @@ public class SqlBuildResult implements Serializable {
         return sessionId;
     }
 
-    public SqlBuildResult setSessionId(String sessionId) {
+    public CmdBuildInfo setSessionId(String sessionId) {
         this.sessionId = sessionId;
         return this;
     }
@@ -107,10 +108,10 @@ public class SqlBuildResult implements Serializable {
      * @param other
      * @return
      */
-    public SqlBuildResult merge(SqlBuildResult other) {
+    public CmdBuildInfo merge(CmdBuildInfo other) {
         if (other == null) return this;
 
-        SqlBuildResult result = new SqlBuildResult(this.level.level > other.level.level ? this.level : other.level);
+        CmdBuildInfo result = new CmdBuildInfo(this.level.level > other.level.level ? this.level : other.level);
         result.addAllMsg(this.msgs);
         result.addAllMsg(other.getMsgs());
 

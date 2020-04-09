@@ -16,6 +16,7 @@ export default {
       maxHeight: null,
     }
   },
+  props: ['value'],
   beforeMount () {
 
   },
@@ -24,9 +25,9 @@ export default {
   },
   methods: {
     initEditor () {
-      console.log("init editor")
+      console.log("init editor", this.value)
       this.sqlEditor = monaco.editor.create(this.$refs.editor, {
-        value: this.input,
+        value: this.value,
         selectOnLineNumbers: true,
         roundedSelection: false,
         automaticLayout: true, //自动布局
