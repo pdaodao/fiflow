@@ -1,9 +1,12 @@
 package com.github.myetl.fiflow.core.sql.builder;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.sql.Cmd;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
+import com.github.myetl.fiflow.core.util.FlinkUtils;
+import org.apache.flink.table.api.Table;
 
 /**
  * select  数据查询
@@ -21,7 +24,21 @@ public class SelectBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public CmdBuildInfo build(Cmd cmd, FiflowSqlSession session) {
-        return null;
+    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+        FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Select);
+        final String sql = cmd.args[0];
+        Table table = session.tEnv.sqlQuery(sql);
+
+        try{
+            FlinkUtils.collect(table);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+//        SocketClientSink
+        // CollectSink
+
+
+        return result;
     }
 }

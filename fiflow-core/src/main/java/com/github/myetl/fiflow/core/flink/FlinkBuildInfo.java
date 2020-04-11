@@ -1,4 +1,4 @@
-package com.github.myetl.fiflow.core.sql;
+package com.github.myetl.fiflow.core.flink;
 
 import com.github.myetl.fiflow.core.pojo.TableData;
 import org.apache.commons.collections.CollectionUtils;
@@ -9,38 +9,38 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 单条 sql 解析执行后的结果
+ * sql/flow 操作转为 flink 操作的构建 结果
  */
-public class CmdBuildInfo implements Serializable {
+public class FlinkBuildInfo implements Serializable {
     // 构建级别
     private final BuildLevel level;
     // 任务id
     private String jobId;
     // 信息
     private List<String> msgs;
-    // 表格数据
+    // 构建过程中生产的表格数据 如 help, show tables 等操作返回的数据
     private TableData table;
     // session id
     private String sessionId;
 
-    public CmdBuildInfo(BuildLevel level) {
+    public FlinkBuildInfo(BuildLevel level) {
         this.level = level;
     }
 
-    public static CmdBuildInfo of(BuildLevel level, TableData rowSet) {
-        CmdBuildInfo r = new CmdBuildInfo(level);
+    public static FlinkBuildInfo of(BuildLevel level, TableData rowSet) {
+        FlinkBuildInfo r = new FlinkBuildInfo(level);
         r.setTable(rowSet);
         return r;
     }
 
-    public CmdBuildInfo addMsg(String msg) {
+    public FlinkBuildInfo addMsg(String msg) {
         if (StringUtils.isEmpty(msg)) return this;
         if (msgs == null) msgs = new ArrayList<>();
         msgs.add(msg);
         return this;
     }
 
-    public CmdBuildInfo addAllMsg(List<String> msg) {
+    public FlinkBuildInfo addAllMsg(List<String> msg) {
         if (msg == null) return this;
         if (msgs == null) msgs = new ArrayList<>();
         msgs.addAll(msg);
@@ -55,7 +55,7 @@ public class CmdBuildInfo implements Serializable {
         return table;
     }
 
-    public CmdBuildInfo setTable(TableData table) {
+    public FlinkBuildInfo setTable(TableData table) {
         if (table == null) return this;
         this.table = table;
         return this;
@@ -73,7 +73,7 @@ public class CmdBuildInfo implements Serializable {
         return msgs;
     }
 
-    public CmdBuildInfo setMsgs(List<String> msgs) {
+    public FlinkBuildInfo setMsgs(List<String> msgs) {
         this.msgs = msgs;
         return this;
     }
@@ -82,7 +82,7 @@ public class CmdBuildInfo implements Serializable {
         return jobId;
     }
 
-    public CmdBuildInfo setJobId(String jobId) {
+    public FlinkBuildInfo setJobId(String jobId) {
         this.jobId = jobId;
         return this;
     }
@@ -105,7 +105,7 @@ public class CmdBuildInfo implements Serializable {
         return sessionId;
     }
 
-    public CmdBuildInfo setSessionId(String sessionId) {
+    public FlinkBuildInfo setSessionId(String sessionId) {
         this.sessionId = sessionId;
         return this;
     }
@@ -116,10 +116,10 @@ public class CmdBuildInfo implements Serializable {
      * @param other
      * @return
      */
-    public CmdBuildInfo merge(CmdBuildInfo other) {
+    public FlinkBuildInfo merge(FlinkBuildInfo other) {
         if (other == null) return this;
 
-        CmdBuildInfo result = new CmdBuildInfo(this.level.level > other.level.level ? this.level : other.level);
+        FlinkBuildInfo result = new FlinkBuildInfo(this.level.level > other.level.level ? this.level : other.level);
         result.addAllMsg(this.msgs);
         result.addAllMsg(other.getMsgs());
 

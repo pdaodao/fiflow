@@ -2,7 +2,7 @@ package com.github.myetl.fiflow.core.sql.builder;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.sql.Cmd;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 
 /**
@@ -16,7 +16,7 @@ public class AlterDatabaseBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public CmdBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
         return null;
     }
 }

@@ -1,4 +1,4 @@
-package com.github.myetl.fiflow.core.sql;
+package com.github.myetl.fiflow.core.flink;
 
 /**
  * 构建级别

@@ -1,9 +1,9 @@
 package com.github.myetl.fiflow.core.sql.builder.system;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
-import com.github.myetl.fiflow.core.sql.BuildLevel;
+import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.sql.Cmd;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 
@@ -24,8 +24,8 @@ public class QuitBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public CmdBuildInfo build(Cmd cmd, FiflowSqlSession session) {
-        CmdBuildInfo result = new CmdBuildInfo(BuildLevel.Error);
+    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+        FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Error);
         result.addMsg("close session and env");
         session.close();
         return result;

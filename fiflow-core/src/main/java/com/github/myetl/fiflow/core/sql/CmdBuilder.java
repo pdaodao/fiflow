@@ -1,6 +1,7 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -27,7 +28,7 @@ public interface CmdBuilder {
      * @param session
      * @return
      */
-    CmdBuildInfo build(Cmd cmd, FiflowSqlSession session);
+    FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session);
 
     /**
      * 帮助信息

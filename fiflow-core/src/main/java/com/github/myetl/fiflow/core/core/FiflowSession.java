@@ -2,7 +2,6 @@ package com.github.myetl.fiflow.core.core;
 
 import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.frame.SessionConfig;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -53,13 +52,6 @@ public abstract class FiflowSession {
 
         tEnv = StreamTableEnvironment.create(env, settings);
     }
-
-    /**
-     * 执行sql
-     *
-     * @param sqlText 多行以;分隔的sql语句
-     */
-    public abstract CmdBuildInfo sql(String sqlText);
 
     public void addJar(String jarName) {
         if (StringUtils.isNotEmpty(jarName))

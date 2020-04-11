@@ -1,8 +1,8 @@
 package com.github.myetl.fiflow.core.core;
 
 import com.github.myetl.fiflow.core.frame.SessionConfig;
-import com.github.myetl.fiflow.core.sql.BuildLevel;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.flink.BuildLevel;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.SqlToFlinkBuilder;
 import com.github.myetl.fiflow.core.util.SqlSplitUtil;
 
@@ -20,18 +20,17 @@ public class FiflowSqlSession extends FiflowSession {
      *
      * @param sqlText 多行以;分隔的sql语句
      */
-    @Override
-    public CmdBuildInfo sql(String sqlText) {
+    public FlinkBuildInfo sql(String sqlText) {
         // 切分多行sql
         List<String> sqls = SqlSplitUtil.split(sqlText);
 
-        CmdBuildInfo buildResult = new CmdBuildInfo(BuildLevel.None);
+        FlinkBuildInfo buildResult = new FlinkBuildInfo(BuildLevel.None);
         for (String sql : sqls) {
-            CmdBuildInfo step;
+            FlinkBuildInfo step;
             try {
                 step = SqlToFlinkBuilder.build(sql, this);
             } catch (Exception e) {
-                step = new CmdBuildInfo(BuildLevel.Error);
+                step = new FlinkBuildInfo(BuildLevel.Error);
                 step.addMsg(e.getMessage());
             }
             buildResult = buildResult.merge(step);

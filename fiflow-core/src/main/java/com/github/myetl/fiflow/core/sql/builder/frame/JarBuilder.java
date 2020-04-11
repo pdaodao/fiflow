@@ -1,9 +1,9 @@
 package com.github.myetl.fiflow.core.sql.builder.frame;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
-import com.github.myetl.fiflow.core.sql.BuildLevel;
+import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.sql.Cmd;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 import com.github.myetl.fiflow.core.util.JarUtils;
@@ -29,9 +29,9 @@ public class JarBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public CmdBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
         String jars = cmd.args[0];
-        CmdBuildInfo result = new CmdBuildInfo(BuildLevel.Set);
+        FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Set);
         if (StringUtils.isEmpty(jars)) {
             result.addMsg("jar is empty");
         }
@@ -45,7 +45,7 @@ public class JarBuilder extends CmdBaseBuilder implements CmdBuilder {
                 session.addJar(jarName);
             }
         } catch (Exception e) {
-            CmdBuildInfo error = new CmdBuildInfo(BuildLevel.Error);
+            FlinkBuildInfo error = new FlinkBuildInfo(BuildLevel.Error);
             error.addMsg("add jar " + jars);
             error.addMsg(e.getMessage());
             result = result.merge(error);

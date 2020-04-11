@@ -1,8 +1,8 @@
 package com.github.myetl.fiflow.web.controller;
 
 
-import com.github.myetl.fiflow.core.sql.BuildLevel;
-import com.github.myetl.fiflow.core.sql.CmdBuildInfo;
+import com.github.myetl.fiflow.core.flink.BuildLevel;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.web.model.SqlCmd;
 import com.github.myetl.fiflow.web.service.FiflowSqlService;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -22,12 +22,12 @@ public class FiflowSqlController {
     private FiflowSqlService fiflowSqlService;
 
     @PostMapping("/run")
-    public CmdBuildInfo runSql(@RequestBody SqlCmd sqlCmd) {
+    public FlinkBuildInfo runSql(@RequestBody SqlCmd sqlCmd) {
         try {
             return fiflowSqlService.run(sqlCmd);
         } catch (Exception e) {
             e.printStackTrace();
-            CmdBuildInfo result = new CmdBuildInfo(BuildLevel.Error);
+            FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Error);
             result.addMsg(ExceptionUtils.getStackTrace(e));
             return result;
         }
