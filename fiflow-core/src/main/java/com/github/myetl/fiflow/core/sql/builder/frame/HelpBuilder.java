@@ -5,7 +5,9 @@ import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.pojo.TableData;
 import com.github.myetl.fiflow.core.pojo.TableRow;
-import com.github.myetl.fiflow.core.sql.*;
+import com.github.myetl.fiflow.core.sql.Cmd;
+import com.github.myetl.fiflow.core.sql.CmdBuilder;
+import com.github.myetl.fiflow.core.sql.CmdType;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,8 +27,12 @@ public class HelpBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
-        FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Show);
+    public BuildLevel buildLevel() {
+        return BuildLevel.Show;
+    }
+
+    @Override
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session) {
         result.addMsg("help message");
 
         TableData rowSet = TableData.instance();

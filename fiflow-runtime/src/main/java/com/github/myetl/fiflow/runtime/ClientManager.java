@@ -1,7 +1,7 @@
 package com.github.myetl.fiflow.runtime;
 
-import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.flink.ClusterMode;
+import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.util.Preconditions;
 import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.MiniClusterClient;
@@ -47,7 +47,7 @@ public class ClientManager {
                 // local
                 Configuration configuration = new Configuration();
 
-                MiniClusterConfiguration miniClusterConfiguration  = new MiniClusterConfiguration.Builder()
+                MiniClusterConfiguration miniClusterConfiguration = new MiniClusterConfiguration.Builder()
                         .setConfiguration(configuration)
                         .setNumTaskManagers(2)
                         .setRpcServiceSharing(RpcServiceSharing.SHARED)

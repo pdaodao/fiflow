@@ -6,6 +6,5 @@ package com.github.myetl.fiflow.core.frame;
  */
 public class SessionConfig {
     public int parallelism = 1;
-    public boolean streamingMode = true;
 
 }

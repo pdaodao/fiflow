@@ -2,8 +2,8 @@ package com.github.myetl.fiflow.core.sql.builder.system;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
-import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
+import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 
@@ -23,8 +23,12 @@ public class UseBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
-        FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Set);
+    public BuildLevel buildLevel() {
+        return BuildLevel.Set;
+    }
+
+    @Override
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session) {
         String database = cmd.args[0];
 
         boolean has = false;

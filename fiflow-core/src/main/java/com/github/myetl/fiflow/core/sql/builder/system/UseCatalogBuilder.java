@@ -2,8 +2,8 @@ package com.github.myetl.fiflow.core.sql.builder.system;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
-import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
+import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 
@@ -23,9 +23,13 @@ public class UseCatalogBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+    public BuildLevel buildLevel() {
+        return BuildLevel.Set;
+    }
+
+    @Override
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session) {
         final String catalog = cmd.args[0];
-        FlinkBuildInfo result = new FlinkBuildInfo(BuildLevel.Set);
         result.addMsg("use catalog " + catalog);
         session.tEnv.useCatalog(catalog);
         return result;

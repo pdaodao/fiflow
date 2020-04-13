@@ -14,37 +14,9 @@
 
 ![如何使用](./docs/fiflow.png)
 
+- demo mysql    jdbc 示例
+- demo kafka    kafka 示例 
 
-``` 
- jar mysql,flink-jdbc;
- CREATE TABLE student ( 
-    name VARCHAR, 
-    age INT, 
-   class VARCHAR 
- ) WITH ( 
-    'connector.type' = 'jdbc', 
-    'connector.url' = 'jdbc:mysql://127.0.0.1:3306/flink', 
-    'connector.table' = 'student', 
-    'connector.username' = 'root',
-    'connector.password' = 'root'
-); 
-
- CREATE TABLE stuout ( 
-    name VARCHAR, 
-    age INT, 
-   class VARCHAR 
- ) WITH ( 
-    'connector.type' = 'jdbc', 
-    'connector.url' = 'jdbc:mysql://127.0.0.1:3306/flink', 
-    'connector.table' = 'stuout', 
-    'connector.username' = 'root',
-    'connector.password' = 'root'
-); 
-
-insert into stuout(name,age,class) 
-   select name, age, class from student where age > 16 ; 
- 
-```
 
 ## 如何运行
 - 后端为基于spring boot的程序，运行 FiflowWebMain 

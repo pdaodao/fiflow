@@ -2,12 +2,13 @@ package com.github.myetl.fiflow.core.stream;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.io.Serializable;
 
 /**
  * 节点之间的连线
  */
-public class Connect implements Serializable {
+public class Link implements Serializable {
     // 源节点id
     private String source;
     // 目标节点id
@@ -19,7 +20,7 @@ public class Connect implements Serializable {
         return source;
     }
 
-    public Connect setSource(String source) {
+    public Link setSource(String source) {
         this.source = source;
         return this;
     }
@@ -28,7 +29,7 @@ public class Connect implements Serializable {
         return target;
     }
 
-    public Connect setTarget(String target) {
+    public Link setTarget(String target) {
         this.target = target;
         return this;
     }
@@ -39,7 +40,7 @@ public class Connect implements Serializable {
 
         if (o == null || getClass() != o.getClass()) return false;
 
-        Connect connect = (Connect) o;
+        Link connect = (Link) o;
 
         return new EqualsBuilder()
                 .append(source, connect.source)

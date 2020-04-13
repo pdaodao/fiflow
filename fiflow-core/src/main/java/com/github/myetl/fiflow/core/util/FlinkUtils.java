@@ -32,7 +32,7 @@ public class FlinkUtils {
         InetAddress address = InetAddress.getByName("10.10.70.118");
         int port = 9092;
 
-        System.out.println("-- address "+address.getHostAddress()+":"+port);
+        System.out.println("-- address " + address.getHostAddress() + ":" + port);
 
         final SocketStreamIterator<Row> iterator = new SocketStreamIterator<>(port, address, serializer);
 
@@ -47,25 +47,25 @@ public class FlinkUtils {
         receiveData(iterator);
     }
 
-    public static void receiveData(final SocketStreamIterator<Row> iterator){
-        Thread getMessageThread = new Thread(){
+    public static void receiveData(final SocketStreamIterator<Row> iterator) {
+        Thread getMessageThread = new Thread() {
             public volatile boolean isRunning = true;
+
             @Override
             public void run() {
-                try{
-                    while(isRunning && iterator.hasNext()){
+                try {
+                    while (isRunning && iterator.hasNext()) {
                         Row row = iterator.next();
                         System.out.print("---- ");
                         System.out.println(row.toString());
                     }
-                }catch (Exception e){
+                } catch (Exception e) {
                     isRunning = false;
                 }
             }
         };
         getMessageThread.start();
     }
-
 
 
     // TableUtils.collectToList
@@ -109,5 +109,5 @@ public class FlinkUtils {
 //        return deserializedList;
 //    }
 
-    
+
 }

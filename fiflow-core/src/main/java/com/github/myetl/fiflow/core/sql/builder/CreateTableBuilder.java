@@ -2,8 +2,8 @@ package com.github.myetl.fiflow.core.sql.builder;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
-import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
+import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import com.github.myetl.fiflow.core.util.SqlSplitUtil;
 
@@ -23,11 +23,15 @@ public class CreateTableBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+    public BuildLevel buildLevel() {
+        return BuildLevel.Create;
+    }
+
+    @Override
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session) {
         String sql = cmd.args[0];
-        FlinkBuildInfo sqlBuildResult = new FlinkBuildInfo(BuildLevel.Create);
         session.tEnv.sqlUpdate(sql);
-        sqlBuildResult.addMsg("create table " + SqlSplitUtil.getCreateTableName(sql) + " ok");
-        return sqlBuildResult;
+        result.addMsg("create table " + SqlSplitUtil.getCreateTableName(sql) + " ok");
+        return result;
     }
 }

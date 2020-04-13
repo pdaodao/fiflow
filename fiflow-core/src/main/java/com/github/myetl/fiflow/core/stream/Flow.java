@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class Flow implements Serializable {
     private List<FlowNode> nodes = new ArrayList<>();
-    private List<Connect> connects = new ArrayList<>();
+    private List<Link> links = new ArrayList<>();
 
 
 }

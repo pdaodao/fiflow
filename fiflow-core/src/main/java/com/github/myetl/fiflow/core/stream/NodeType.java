@@ -10,5 +10,5 @@ public enum NodeType {
     Map,
     Flatmap,
     Join,
-    Project;
+    Project
 }

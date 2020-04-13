@@ -1,5 +1,8 @@
 package com.github.myetl.fiflow.core.sql.builder;
 
+import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
+import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -30,6 +33,13 @@ public abstract class CmdBaseBuilder implements CmdBuilder {
             IOUtils.closeQuietly(inputStream);
         }
     }
+
+    @Override
+    public FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session) {
+        return build(new FlinkBuildInfo(buildLevel()), cmd, session);
+    }
+
+    public abstract FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session);
 
     @Override
     public Optional<String[]> accept(String sql) {

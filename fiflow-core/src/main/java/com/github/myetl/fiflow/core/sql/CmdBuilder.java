@@ -1,6 +1,7 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 
 import java.util.Optional;
@@ -22,7 +23,23 @@ public interface CmdBuilder {
     Optional<String[]> accept(String sql);
 
     /**
-     * 构建
+     * 构建级别
+     * @return
+     */
+    BuildLevel buildLevel();
+
+    /**
+     * 先预处理一下
+     * @param cmd
+     * @param buildContext          本次上下文
+     * @param previousContext       以前的上下文
+     */
+    default void preBuild(Cmd cmd, BuildContext buildContext, BuildContext previousContext) {
+
+    }
+
+    /**
+     * 构建 把 sql 转换为 flink 中的操作
      *
      * @param cmd
      * @param session

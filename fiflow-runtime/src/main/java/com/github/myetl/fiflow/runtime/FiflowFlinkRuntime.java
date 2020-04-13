@@ -2,8 +2,8 @@ package com.github.myetl.fiflow.runtime;
 
 import com.github.myetl.fiflow.core.core.FiflowRuntime;
 import com.github.myetl.fiflow.core.core.FiflowSession;
-import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.flink.ClusterMode;
+import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.frame.JobSubmitResult;
 import com.github.myetl.fiflow.core.util.JarUtils;
 import com.github.myetl.fiflow.core.util.Preconditions;
@@ -37,7 +37,7 @@ public class FiflowFlinkRuntime implements FiflowRuntime {
 
         StreamGraph streamGraph = session.env.getStreamGraph(session.getName());
         JobGraph jobGraph = streamGraph.getJobGraph();
-        if(CollectionUtils.isNotEmpty(session.getJars())){
+        if (CollectionUtils.isNotEmpty(session.getJars())) {
             jobGraph.addJars(JarUtils.jars(session.getJars().toArray(new String[0])));
         }
 

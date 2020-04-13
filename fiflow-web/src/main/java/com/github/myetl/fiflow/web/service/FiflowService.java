@@ -38,14 +38,5 @@ public class FiflowService {
         JobSubmitResult jobSubmitResult = fiflowRuntime.submit(fiflowSqlSession);
 
         return jobSubmitResult.getJobId();
-
-
-        //        if(sqlBuildContext.needExecute){
-////            FiflowRunner.executeLocal(session);
-//            FiflowFlinkExecutor.executeStandalone(session, null);
-//        }
-//        SqlExecuteResult ret = new SqlExecuteResult();
-//        ret.setSessionId(session.getId());
-
     }
 }

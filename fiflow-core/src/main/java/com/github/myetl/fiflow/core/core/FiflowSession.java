@@ -20,6 +20,7 @@ public abstract class FiflowSession {
     public final SessionConfig sessionConfig;
 
     public StreamExecutionEnvironment env;
+    public boolean streamingMode = false;
     public EnvironmentSettings settings;
     public TableEnvironment tEnv;
     public FlinkClusterInfo flinkClusterInfo;
@@ -30,12 +31,17 @@ public abstract class FiflowSession {
     public FiflowSession(String id, SessionConfig sessionConfig) {
         this.id = id;
         this.sessionConfig = sessionConfig;
-
-        init();
     }
 
-    private void init() {
-        if (env != null) return;
+
+    /**
+     * 初始化 environment
+     * @param streamingMode
+     * @return  true 表示新建 false 表示使用旧的 env
+     */
+    public boolean initEnv(boolean streamingMode) {
+        streamingMode = true; 
+        if (env != null && this.streamingMode == streamingMode) return false;
 
         env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(sessionConfig.parallelism);
@@ -43,14 +49,19 @@ public abstract class FiflowSession {
         EnvironmentSettings.Builder settingBuilder = EnvironmentSettings
                 .newInstance()
                 .useBlinkPlanner();
-        if (sessionConfig.streamingMode) {
+
+        if (streamingMode) {
             settingBuilder.inStreamingMode();
+            settings = settingBuilder.build();
+            tEnv = StreamTableEnvironment.create(env, settings);
         } else {
             settingBuilder.inBatchMode();
+            settings = settingBuilder.build();
+            tEnv = TableEnvironment.create(settings);
         }
-        settings = settingBuilder.build();
 
-        tEnv = StreamTableEnvironment.create(env, settings);
+
+        return true;
     }
 
     public void addJar(String jarName) {

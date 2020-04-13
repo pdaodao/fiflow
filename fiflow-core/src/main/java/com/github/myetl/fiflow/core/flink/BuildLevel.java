@@ -7,7 +7,7 @@ package com.github.myetl.fiflow.core.flink;
  * 3. insert 可以直接提交执行
  */
 public enum BuildLevel {
-    None(0),      // 舍也没有
+    None(0),     // 啥也没干
     Show(1),     // help, show tables  之类的无需执行 只要给出信息
     Set(2),      // 设置 jar 并发 等
 
@@ -15,8 +15,7 @@ public enum BuildLevel {
     Select(4),   // select
     Insert(5),   // insert
 
-    Error(6);    // 错误
-
+    Error(11);    // 错误
 
     public final Integer level;
 
