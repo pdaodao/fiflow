@@ -14,8 +14,8 @@
 
 ![如何使用](./docs/fiflow.png)
 
-- demo mysql    jdbc 示例
-- demo kafka    kafka 示例 
+- demo mysql    :  jdbc 示例
+- demo kafka    :  kafka 示例 todo 
 
 
 ## 如何运行
@@ -25,7 +25,7 @@
 ## todo 
 - flink 集群管理 
 - 任务管理 
-- 数据源管理
+- 使用 数据源管理功能 取代 create table 操作
 
 ## Thanks 
 - flink 
