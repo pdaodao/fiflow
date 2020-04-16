@@ -1,10 +1,10 @@
 package com.github.myetl.fiflow.core.sql.builder;
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
+import com.github.myetl.fiflow.core.sql.SqlSessionContext;
 import com.github.myetl.fiflow.core.util.SqlSplitUtil;
 
 /**
@@ -29,9 +29,9 @@ public class InsertIntoBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session) {
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext sessionContext) {
         final String sql = cmd.args[0];
-        session.tEnv.sqlUpdate(sql);
+        sessionContext.tEnv.sqlUpdate(sql);
 
         result.addMsg("prepare insert into " + SqlSplitUtil.getInsertIntoTableName(sql));
         return result;

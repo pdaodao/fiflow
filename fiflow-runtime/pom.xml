@@ -20,12 +20,6 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-table-planner-blink_${scala.binary.version}</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
             <artifactId>flink-jdbc_2.11</artifactId>
             <version>${flink.version}</version>
         </dependency>

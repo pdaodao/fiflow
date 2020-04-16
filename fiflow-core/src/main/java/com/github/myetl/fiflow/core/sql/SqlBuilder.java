@@ -1,93 +1,110 @@
 package com.github.myetl.fiflow.core.sql;
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.api.java.tuple.Tuple2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 /**
  * sql command 转化为 flink 的操作
  */
-public class SqlBuilder {
+public class SqlBuilder extends CmdListImpl implements CmdList {
     public final FiflowSqlSession session;
+    public final List<String> sqlList;
+    public final SqlSessionContext previousContext;
 
-    public final BuildContext buildContext = new BuildContext();
-    public final BuildContext previousContext;
 
-    public SqlBuilder(FiflowSqlSession session) {
+    public SqlBuilder(FiflowSqlSession session, List<String> sqlList) {
         this.session = session;
-        previousContext = new BuildContext();
-        if(CollectionUtils.isNotEmpty(session.getSteps())){
-            for(BuildContext step : session.getSteps()){
-                previousContext.addCmdAll(step.getCmdList());
-            }
+        this.sqlList = sqlList;
+
+        SqlSessionContext lastContext = null;
+        List<Cmd> cmdList = new ArrayList<>();
+        for (SqlSessionContext context : session.getContextList()) {
+            cmdList.addAll(context.getCmdList());
+            lastContext = context;
         }
+        String lastId = "previous";
+        previousContext = SqlSessionContext.create(lastId, lastContext);
+        previousContext.addCmdAll(cmdList);
     }
 
     /**
-     * 先预构建下 得到全局的信息
+     * 预处理
      *
-     * @param sql
-     * @return
+     * @param sql 单条 sql
      */
-    public Cmd preBuild(String sql) {
-        if(StringUtils.isBlank(sql)) return null;
+    private void preBuild(String sql) {
+        if (StringUtils.isBlank(sql)) return;
         sql = sql.trim();
-
         for (CmdType cmdType : CmdType.values()) {
             Optional<String[]> accept = cmdType.cmdBuilder.accept(sql);
             if (accept.isPresent()) {
                 Cmd cmd = new Cmd(cmdType, accept.get());
-                cmd.preBuild(buildContext, previousContext);
-
-                buildContext.addCmd(cmd);
-                return cmd;
+                cmd.preBuild(this);
+                addCmd(cmd);
+                return;
             }
         }
         throw new IllegalArgumentException("unknown sql type: " + sql);
     }
 
-    /**
-     * 在构建之前 利用全局信息做一些优化
-     */
-    private void beforeBuild() {
-        // todo 判断是否从 kafa 读数据 从而需要切换到 streaming 模式
-        // 此逻辑可能写在具体的 builder 中
 
-        // 根据本次预构建的结果 确定是否使用 streaming 模式
-        boolean isNewCreated = session.initEnv(buildContext.getStreamingMode());
-        if(isNewCreated) {
-            // 重放 set 和 create 操作 来构造环境
-            for(Cmd cmd: previousContext.getCmdList()){
-                if(cmd.level()  == BuildLevel.Set || cmd.level() == BuildLevel.Create){
-                    cmd.build(session);
-                }
-            }
+    /**
+     * 先预构建下 得到全局的信息
+     *
+     * @return
+     */
+    private void preBuild() {
+        // 1. 先预处理一下 得到全局的信息
+        for (String sql : sqlList) {
+            preBuild(sql);
         }
     }
 
     /**
-     * 把该批次的多行 sql 转换为 flink 中的操作
+     * 初始化环境
+     * 这里利用得到的全局信息 创建 或者 继承 context
+     * 还可以做一些优化 比如 谓词下推等
+     * 如果环境改变需要 重放 set 和 create 操作 来构造环境
      *
      * @return
      */
-    public FlinkBuildInfo build() {
-        // 这里利用得到的全局信息 做一些优化
-        beforeBuild();
+    private SqlSessionContext initContext() {
+        SqlSessionContext context = SqlSessionContext.create(session.incrementAndGetContextId(), this.previousContext);
+        context.addCmdAll(getCmdList());
+        return context;
+    }
+
+    /**
+     * 预处理 > 初始化环境 > 转换到 flink 操作
+     *
+     * @return
+     */
+    public Tuple2<FlinkBuildInfo, SqlSessionContext> build() {
+        //1. 预处理
+        preBuild();
+        //2. 初始化环境
+        final SqlSessionContext sessionContext = initContext();
+        //3. 转换到 flink 操作
 
         FlinkBuildInfo buildInfo = new FlinkBuildInfo(BuildLevel.None);
-        for (Cmd cmd : buildContext.getCmdList()) {
 
-            FlinkBuildInfo cmdBuildInfo = cmd.build(session);
-
+        for (Cmd cmd : getCmdList()) {
+            FlinkBuildInfo cmdBuildInfo = cmd.build(sessionContext);
             buildInfo = buildInfo.merge(cmdBuildInfo);
-
             if (buildInfo.getLevel() == BuildLevel.Error)
-                return buildInfo;
+                return new Tuple2(buildInfo, null);
         }
-        return buildInfo;
+
+        session.addContext(sessionContext);
+        buildInfo.setContextId(sessionContext.id);
+        buildInfo.setSessionId(session.id);
+
+        return new Tuple2(buildInfo, sessionContext);
     }
 }

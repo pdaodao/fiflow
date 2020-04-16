@@ -10,9 +10,9 @@ public interface FiflowRuntime {
     /**
      * 提交任务  这里只返回任务id 任务状态什么的单独获取
      *
-     * @param flowSession
+     * @param sessionContext
      * @return
      * @throws Exception
      */
-    JobSubmitResult submit(FiflowSession flowSession) throws Exception;
+    JobSubmitResult submit(SessionContext sessionContext) throws Exception;
 }

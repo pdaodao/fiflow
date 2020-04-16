@@ -23,6 +23,8 @@ public class FlinkBuildInfo implements Serializable {
     // session id
     private String sessionId;
 
+    private String contextId;
+
     public FlinkBuildInfo(BuildLevel level) {
         this.level = level;
     }
@@ -75,6 +77,15 @@ public class FlinkBuildInfo implements Serializable {
 
     public FlinkBuildInfo setMsgs(List<String> msgs) {
         this.msgs = msgs;
+        return this;
+    }
+
+    public String getContextId() {
+        return contextId;
+    }
+
+    public FlinkBuildInfo setContextId(String contextId) {
+        this.contextId = contextId;
         return this;
     }
 

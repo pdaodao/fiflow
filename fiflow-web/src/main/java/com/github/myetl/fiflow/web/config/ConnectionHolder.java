@@ -3,10 +3,8 @@ package com.github.myetl.fiflow.web.config;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.eventbus.impl.OutboundDeliveryContext;
-import io.vertx.core.eventbus.impl.clustered.ClusteredEventBus;
 import io.vertx.core.eventbus.impl.clustered.ClusteredMessage;
 import io.vertx.core.eventbus.impl.codecs.PingMessageCodec;
 import io.vertx.core.impl.logging.Logger;
@@ -70,7 +68,7 @@ class ConnectionHolder {
     // TODO optimise this (contention on monitor)
     synchronized void writeMessage(OutboundDeliveryContext<?> ctx) {
         if (connected) {
-            Buffer data = ((ClusteredMessage)ctx.message).encodeToWire();
+            Buffer data = ((ClusteredMessage) ctx.message).encodeToWire();
             if (metrics != null) {
                 metrics.messageWritten(ctx.message.address(), data.length());
             }
@@ -153,7 +151,7 @@ class ConnectionHolder {
                 log.debug("Draining the queue for server " + serverID);
             }
             for (OutboundDeliveryContext<?> ctx : pending) {
-                Buffer data = ((ClusteredMessage<?, ?>)ctx.message).encodeToWire();
+                Buffer data = ((ClusteredMessage<?, ?>) ctx.message).encodeToWire();
                 if (metrics != null) {
                     metrics.messageWritten(ctx.message.address(), data.length());
                 }

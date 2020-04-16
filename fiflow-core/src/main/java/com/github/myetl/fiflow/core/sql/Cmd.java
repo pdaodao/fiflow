@@ -1,6 +1,5 @@
 package com.github.myetl.fiflow.core.sql;
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -12,6 +11,7 @@ import java.util.Arrays;
 public class Cmd implements Serializable {
     public CmdType cmdType;
     public String[] args;
+
     public Cmd(CmdType cmdType, String[] args) {
         this.cmdType = cmdType;
         this.args = args;
@@ -20,7 +20,7 @@ public class Cmd implements Serializable {
     public Cmd() {
     }
 
-    public BuildLevel level(){
+    public BuildLevel level() {
         return cmdType.cmdBuilder.buildLevel();
     }
 
@@ -69,11 +69,11 @@ public class Cmd implements Serializable {
         return this;
     }
 
-    public void preBuild(BuildContext buildContext, BuildContext previousContext) {
-        cmdType.cmdBuilder.preBuild(this, buildContext, previousContext);
+    public void preBuild(SqlBuilder sqlBuilder) {
+        cmdType.cmdBuilder.preBuild(this, sqlBuilder);
     }
 
-    public FlinkBuildInfo build(FiflowSqlSession session) {
-        return cmdType.cmdBuilder.build(this, session);
+    public FlinkBuildInfo build(SqlSessionContext sqlSessionContext) {
+        return cmdType.cmdBuilder.build(this, sqlSessionContext);
     }
 }

@@ -4,7 +4,10 @@ import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBusOptions;
 import io.vertx.core.eventbus.MessageCodec;
-import io.vertx.core.eventbus.impl.*;
+import io.vertx.core.eventbus.impl.CodecManager;
+import io.vertx.core.eventbus.impl.EventBusImpl;
+import io.vertx.core.eventbus.impl.MessageImpl;
+import io.vertx.core.eventbus.impl.OutboundDeliveryContext;
 import io.vertx.core.eventbus.impl.clustered.ClusterNodeInfo;
 import io.vertx.core.eventbus.impl.clustered.ClusteredMessage;
 import io.vertx.core.impl.VertxInternal;
@@ -16,7 +19,9 @@ import io.vertx.core.net.NetSocket;
 import io.vertx.core.net.impl.ServerID;
 import io.vertx.core.parsetools.RecordParser;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -24,28 +29,27 @@ public class MyEventBus extends EventBusImpl {
     private static final Logger log = LoggerFactory.getLogger(MyEventBus.class);
 
     private static final Buffer PONG = Buffer.buffer(new byte[]{(byte) 1});
-    private NetServer server;
     public final ConcurrentMap<ServerID, ConnectionHolder> connections = new ConcurrentHashMap<>();
-    private ServerID serverID;
     public final EventBusOptions options;
-
-    private List<ClusterNodeInfo> subs;
     private final int port;
+    private NetServer server;
+    private ServerID serverID;
+    private List<ClusterNodeInfo> subs;
 
 
-    public MyEventBus(VertxInternal vertx, int port , VertxOptions options,  List<ClusterNodeInfo> subs) {
+    public MyEventBus(VertxInternal vertx, int port, VertxOptions options, List<ClusterNodeInfo> subs) {
         super(vertx);
         this.port = port;
         this.options = options.getEventBusOptions();
-        if(subs == null) subs = new ArrayList<>();
+        if (subs == null) subs = new ArrayList<>();
         this.subs = subs;
     }
 
-    public VertxInternal vertx(){
+    public VertxInternal vertx() {
         return this.vertx;
     }
 
-    public NetServerOptions getServerOptions(){
+    public NetServerOptions getServerOptions() {
         return new NetServerOptions().setPort(port).setHost("127.0.0.1");
     }
 
@@ -98,7 +102,7 @@ public class MyEventBus extends EventBusImpl {
                 serverID = new ServerID(serverPort, "127.0.0.1");
                 System.out.println("server start " + serverPort);
             } else {
-                 System.out.println("server start failed.");
+                System.out.println("server start failed.");
             }
         });
         this.started = true;
@@ -142,11 +146,11 @@ public class MyEventBus extends EventBusImpl {
         if (sendContext.options.isLocalOnly()) {
             super.sendOrPub(sendContext);
         } else if (Vertx.currentContext() != sendContext.ctx) {
-            for(ClusterNodeInfo  nodeInfo :  subs){
+            for (ClusterNodeInfo nodeInfo : subs) {
                 sendRemote(sendContext, nodeInfo.serverID);
             }
         } else {
-            for(ClusterNodeInfo  nodeInfo :  subs){
+            for (ClusterNodeInfo nodeInfo : subs) {
                 sendRemote(sendContext, nodeInfo.serverID);
             }
         }

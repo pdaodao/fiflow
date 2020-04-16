@@ -30,6 +30,13 @@ public enum BuildLevel {
         return null;
     }
 
+    public boolean isNeedExecute() {
+        if (this == BuildLevel.Select || this == BuildLevel.Insert) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return name();

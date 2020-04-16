@@ -1,7 +1,7 @@
 package com.github.myetl.fiflow.web.service;
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
+import com.github.myetl.fiflow.core.sql.FiflowSqlSession;
 import com.github.myetl.fiflow.web.model.SqlCmd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,23 +23,8 @@ public class FiflowSqlService {
     public FlinkBuildInfo run(SqlCmd cmd) throws Exception {
         FiflowSqlSession session = fiflowService.getOrCreateSession(cmd.getSessionId());
 
-        FlinkBuildInfo buildResult = session.sql(cmd.getSql());
+        return session.sql(cmd.getSql());
 
-        buildResult.setSessionId(session.id);
-
-        switch (buildResult.getLevel()) {
-            case Select: ;
-            case Insert: {
-                // 提交执行
-                String jobId = fiflowService.execute(session);
-                buildResult.addMsg("submit job :"+jobId);
-                buildResult.setJobId(jobId);
-                break;
-            }
-            default:
-                break;
-        }
-        return buildResult;
     }
 
 }

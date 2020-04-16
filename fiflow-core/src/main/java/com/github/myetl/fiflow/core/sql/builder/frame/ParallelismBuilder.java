@@ -1,10 +1,10 @@
 package com.github.myetl.fiflow.core.sql.builder.frame;
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.sql.Cmd;
 import com.github.myetl.fiflow.core.sql.CmdBuilder;
+import com.github.myetl.fiflow.core.sql.SqlSessionContext;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 import org.apache.flink.table.api.config.ExecutionConfigOptions;
 
@@ -30,7 +30,7 @@ public class ParallelismBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, FiflowSqlSession session) {
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext session) {
         String p = cmd.args[0];
         result.addMsg("set parallelism " + p);
         Integer pp = Integer.parseInt(p);

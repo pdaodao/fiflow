@@ -1,7 +1,7 @@
 package com.github.myetl.fiflow.core.frame;
 
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
+import com.github.myetl.fiflow.core.sql.FiflowSqlSession;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 

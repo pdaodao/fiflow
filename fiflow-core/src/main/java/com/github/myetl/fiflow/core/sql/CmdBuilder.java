@@ -1,6 +1,5 @@
 package com.github.myetl.fiflow.core.sql;
 
-import com.github.myetl.fiflow.core.core.FiflowSqlSession;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 
@@ -24,17 +23,19 @@ public interface CmdBuilder {
 
     /**
      * 构建级别
+     *
      * @return
      */
     BuildLevel buildLevel();
 
+
     /**
      * 先预处理一下
+     *
      * @param cmd
-     * @param buildContext          本次上下文
-     * @param previousContext       以前的上下文
+     * @param sqlBuilder
      */
-    default void preBuild(Cmd cmd, BuildContext buildContext, BuildContext previousContext) {
+    default void preBuild(Cmd cmd, SqlBuilder sqlBuilder) {
 
     }
 
@@ -42,10 +43,10 @@ public interface CmdBuilder {
      * 构建 把 sql 转换为 flink 中的操作
      *
      * @param cmd
-     * @param session
+     * @param sessionContext
      * @return
      */
-    FlinkBuildInfo build(Cmd cmd, FiflowSqlSession session);
+    FlinkBuildInfo build(Cmd cmd, SqlSessionContext sessionContext);
 
     /**
      * 帮助信息
