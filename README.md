@@ -15,7 +15,7 @@
 ![如何使用](./docs/fiflow.png)
 
 - demo mysql    :  jdbc 示例
-- demo kafka    :  kafka 示例 todo 
+- demo kafka    :  kafka 示例
 
 
 ## 如何运行
