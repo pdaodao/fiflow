@@ -1,6 +1,7 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.core.FiflowSession;
+import com.github.myetl.fiflow.core.core.SessionContext;
 import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
 import com.github.myetl.fiflow.core.frame.SessionConfig;
 import com.github.myetl.fiflow.core.util.SqlSplitUtil;
@@ -25,17 +26,17 @@ public class FiflowSqlSession extends FiflowSession<SqlSessionContext> {
 
         Tuple2<FlinkBuildInfo, SqlSessionContext> ret = sqlBuilder.build();
 
+        SessionContext context = ret.f1;
         FlinkBuildInfo buildResult = ret.f0;
-        SqlSessionContext context = ret.f1;
+
 
         switch (buildResult.getLevel()) {
             case Select:
-                ;
             case Insert: {
                 // 提交执行
                 String jobId = context.submit().getJobId();
-                buildResult.addMsg("submit job :" + jobId);
                 buildResult.setJobId(jobId);
+                buildResult.addMsg("submit job :" + jobId);
                 break;
             }
             default:

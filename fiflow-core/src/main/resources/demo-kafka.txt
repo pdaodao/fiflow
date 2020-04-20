@@ -1,0 +1,34 @@
+jar mysql,flink-jdbc,flink-json,kafka;
+
+CREATE TABLE student (
+        name VARCHAR,
+        age INT,
+        class VARCHAR
+) WITH (
+      'connector.type' = 'kafka',
+      'connector.version' = 'universal',
+      'connector.topic' = 'student',
+      'connector.startup-mode' = 'group-offsets',
+      'connector.properties.zookeeper.connect' = '127.0.0.1:2181',
+      'connector.properties.bootstrap.servers' = '127.0.0.1:9092',
+      'connector.properties.group.id' = 'kafka-mysql',
+      'format.type' = 'json',
+      'format.derive-schema' = 'true'
+);
+
+CREATE TABLE stuout (
+    name VARCHAR,
+    age INT,
+   class VARCHAR
+ ) WITH (
+    'connector.type' = 'jdbc',
+    'connector.url' = 'jdbc:mysql://127.0.0.1:3306/flink',
+    'connector.table' = 'stuout',
+    'connector.username' = 'root',
+    'connector.password' = 'root',
+    'connector.write.flush.max-rows' = '500',
+    'connector.write.flush.interval' = '300'
+);
+
+insert into stuout(name,age,class)
+   select name, age, class from student where age > 16 ;

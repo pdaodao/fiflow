@@ -19,9 +19,18 @@ public abstract class FiflowSession<T extends SessionContext> {
 
     public FiflowSession(String id, SessionConfig sessionConfig) {
         this.id = id;
+        if (sessionConfig == null) {
+            sessionConfig = new SessionConfig();
+        }
         this.sessionConfig = sessionConfig;
     }
 
+    /**
+     * context build 成功后 才加入到 session 中
+     *
+     * @param conetxt
+     * @return
+     */
     public FiflowSession addContext(T conetxt) {
         this.contextList.add(conetxt);
         return this;

@@ -2,6 +2,8 @@ package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.core.SessionContext;
 import com.github.myetl.fiflow.core.flink.BuildLevel;
+import com.github.myetl.fiflow.core.flink.FlinkBuildInfo;
+import com.github.myetl.fiflow.core.util.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
@@ -10,13 +12,19 @@ import org.apache.flink.table.api.java.StreamTableEnvironment;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlSessionContext extends SessionContext {
+public final class SqlSessionContext extends SessionContext {
     public final EnvironmentSettings settings;
     public final StreamTableEnvironment tEnv;
-    private List<Cmd> cmdList = new ArrayList<>();
+    public final List<Cmd> cmdList;
 
-    public SqlSessionContext(String id, StreamExecutionEnvironment env, EnvironmentSettings settings, StreamTableEnvironment tEnv) {
-        super(id, env);
+    private SqlSessionContext(String id, List<Cmd> cmdList, FiflowSqlSession session, StreamExecutionEnvironment env,
+                              EnvironmentSettings settings, StreamTableEnvironment tEnv) {
+        super(id, session, env);
+        this.cmdList = new ArrayList<>();
+        if (cmdList != null) {
+            this.cmdList.addAll(cmdList);
+        }
+
         if (settings == null) {
             settings = EnvironmentSettings
                     .newInstance()
@@ -31,34 +39,28 @@ public class SqlSessionContext extends SessionContext {
         this.tEnv = tEnv;
     }
 
-    public static SqlSessionContext create(String id, SqlSessionContext previous) {
-        if (previous == null) {
-            return create(id);
+
+    public static SqlSessionContext create(String id, List<Cmd> cmdList, FiflowSqlSession session) {
+        Preconditions.checkNotNull(session, "FiflowSqlSession is null");
+        StreamExecutionEnvironment env = null;
+        EnvironmentSettings settings = null;
+        StreamTableEnvironment tEnv = null;
+        for (SqlSessionContext ct : session.getContextList()) {
+            if (ct.env != null) env = ct.env;
+            if (ct.settings != null) settings = ct.settings;
+            if (ct.tEnv != null) tEnv = ct.tEnv;
         }
-        return new SqlSessionContext(id, previous.env, previous.settings, previous.tEnv);
+        return new SqlSessionContext(id, cmdList, session, env, settings, tEnv);
     }
 
-    public static SqlSessionContext create(String id) {
-        return new SqlSessionContext(id, null, null, null);
-    }
-
-    public void addCmd(Cmd cmd) {
-        if (cmd != null)
-            this.cmdList.add(cmd);
-    }
-
-    public void addCmdAll(List<Cmd> cmds) {
-        if (cmds != null)
-            this.cmdList.addAll(cmds);
-    }
-
-    public List<Cmd> getCmdList() {
-        return cmdList;
-    }
-
-    public SqlSessionContext setCmdList(List<Cmd> cmdList) {
-        this.cmdList = cmdList;
-        return this;
+    /**
+     * 自动生成 id
+     *
+     * @param session
+     * @return
+     */
+    public static SqlSessionContext create(List<Cmd> cmdList, FiflowSqlSession session) {
+        return create(null, cmdList, session);
     }
 
     /**
@@ -75,5 +77,32 @@ public class SqlSessionContext extends SessionContext {
             }
         }
         return level;
+    }
+
+    /**
+     * 把 cmd 命令 转成 flink 操作
+     *
+     * @return
+     */
+    @Override
+    public FlinkBuildInfo build() {
+        super.build();
+        FlinkBuildInfo buildInfo = new FlinkBuildInfo(BuildLevel.None);
+        for (Cmd cmd : cmdList) {
+            FlinkBuildInfo cmdBuildInfo = cmd.build(this);
+            buildInfo = buildInfo.merge(cmdBuildInfo);
+            if (buildInfo.getLevel() == BuildLevel.Error)
+                return buildInfo;
+        }
+        session.addContext(this);
+
+        buildInfo.setSessionId(session.id);
+        buildInfo.setContextId(id);
+        return buildInfo;
+    }
+
+    @Override
+    protected boolean isNeedSubmit() {
+        return level().isNeedExecute();
     }
 }

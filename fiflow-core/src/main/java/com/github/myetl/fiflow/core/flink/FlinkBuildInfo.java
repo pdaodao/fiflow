@@ -14,16 +14,17 @@ import java.util.List;
 public class FlinkBuildInfo implements Serializable {
     // 构建级别
     private final BuildLevel level;
-    // 任务id
-    private String jobId;
     // 信息
     private List<String> msgs;
     // 构建过程中生产的表格数据 如 help, show tables 等操作返回的数据
     private TableData table;
-    // session id
-    private String sessionId;
 
+    // FiflowSession id
+    private String sessionId;
+    // SessionContext id
     private String contextId;
+    // submit job id
+    private String jobId;
 
     public FlinkBuildInfo(BuildLevel level) {
         this.level = level;
@@ -80,6 +81,16 @@ public class FlinkBuildInfo implements Serializable {
         return this;
     }
 
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public FlinkBuildInfo setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+        return this;
+    }
+
     public String getContextId() {
         return contextId;
     }
@@ -101,8 +112,8 @@ public class FlinkBuildInfo implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        if (StringUtils.isNotEmpty(jobId)) {
-            sb.append("jobId:").append(jobId).append("\n");
+        if (StringUtils.isNotEmpty(getJobId())) {
+            sb.append("jobId:").append(getJobId()).append("\n");
         }
         sb.append("build level:" + level).append("\n");
         if (CollectionUtils.isNotEmpty(msgs))
@@ -112,14 +123,6 @@ public class FlinkBuildInfo implements Serializable {
         return sb.toString();
     }
 
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    public FlinkBuildInfo setSessionId(String sessionId) {
-        this.sessionId = sessionId;
-        return this;
-    }
 
     /**
      * 合并
@@ -129,7 +132,6 @@ public class FlinkBuildInfo implements Serializable {
      */
     public FlinkBuildInfo merge(FlinkBuildInfo other) {
         if (other == null) return this;
-
         FlinkBuildInfo result = new FlinkBuildInfo(this.level.level > other.level.level ? this.level : other.level);
         result.addAllMsg(this.msgs);
         result.addAllMsg(other.getMsgs());

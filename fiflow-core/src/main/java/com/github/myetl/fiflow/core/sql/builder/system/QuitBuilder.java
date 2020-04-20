@@ -29,9 +29,9 @@ public class QuitBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
-    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext session) {
+    public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext context) {
         result.addMsg("close session and env");
-//        session.close();
+        context.session.close();
         return result;
     }
 }

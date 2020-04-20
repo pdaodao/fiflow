@@ -5,14 +5,13 @@ import com.github.myetl.fiflow.core.core.SessionContext;
 import com.github.myetl.fiflow.core.flink.ClusterMode;
 import com.github.myetl.fiflow.core.flink.FlinkClusterInfo;
 import com.github.myetl.fiflow.core.frame.JobSubmitResult;
-import com.github.myetl.fiflow.core.util.JarUtils;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.api.common.JobExecutionResult;
 import org.apache.flink.client.ClientUtils;
 import org.apache.flink.client.program.ClusterClient;
+import org.apache.flink.core.execution.JobClient;
 import org.apache.flink.runtime.jobgraph.JobGraph;
+import org.apache.flink.streaming.api.environment.LocalStreamEnvironment;
 import org.apache.flink.streaming.api.graph.StreamGraph;
-
 
 /**
  * 在 flink 中运行
@@ -27,20 +26,36 @@ public class FiflowFlinkRuntime implements FiflowRuntime {
         FlinkClusterInfo flinkClusterInfo = new FlinkClusterInfo();
         flinkClusterInfo.setMode(ClusterMode.local);
         flinkClusterInfo.setCode("local1");
+        StreamGraph streamGraph = sessionContext.getGraph();
 
-        sessionContext.env.setParallelism(1);
+        if (flinkClusterInfo.getMode() == ClusterMode.local) {
+            return local(streamGraph);
+        } else if (flinkClusterInfo.getMode() == ClusterMode.standalone) {
+            return standAlone(sessionContext, flinkClusterInfo, streamGraph);
+        }
+        throw new UnsupportedOperationException("unsupport ");
+    }
+
+    private JobSubmitResult standAlone(SessionContext sessionContext, FlinkClusterInfo flinkClusterInfo, StreamGraph streamGraph) throws Exception {
+        JobGraph jobGraph = streamGraph.getJobGraph();
+
+        // 添加依赖 jar 包
+        jobGraph.addJars(sessionContext.getJarFile());
 
         ClusterClient client = ClientManager.getClient(flinkClusterInfo);
 
-        StreamGraph streamGraph = sessionContext.getGraph();
-        JobGraph jobGraph = streamGraph.getJobGraph();
-
-        if (CollectionUtils.isNotEmpty(sessionContext.getJars())) {
-            jobGraph.addJars(JarUtils.jars(sessionContext.getJars().toArray(new String[0])));
-        }
 
         JobExecutionResult result = ClientUtils.submitJob(client, jobGraph);
+
         String jobId = result.getJobID().toString();
+        return new JobSubmitResult(jobId);
+
+    }
+
+    private JobSubmitResult local(StreamGraph streamGraph) throws Exception {
+        LocalStreamEnvironment local = LocalStreamEnvironment.createLocalEnvironment();
+        JobClient client = local.executeAsync(streamGraph);
+        String jobId = client.getJobID().toString();
         return new JobSubmitResult(jobId);
     }
 }

@@ -47,9 +47,11 @@ public class ClientManager {
                 // local
                 Configuration configuration = new Configuration();
 
+
                 MiniClusterConfiguration miniClusterConfiguration = new MiniClusterConfiguration.Builder()
                         .setConfiguration(configuration)
-                        .setNumTaskManagers(2)
+                        .setNumTaskManagers(1)
+                        .setNumSlotsPerTaskManager(4)
                         .setRpcServiceSharing(RpcServiceSharing.SHARED)
                         .build();
 
