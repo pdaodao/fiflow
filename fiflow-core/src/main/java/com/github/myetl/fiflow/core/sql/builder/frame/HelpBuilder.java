@@ -23,7 +23,7 @@ public class HelpBuilder extends CmdBaseBuilder implements CmdBuilder {
 
     @Override
     public String help() {
-        return "help; show help message";
+        return "<span style='color:green'>help</span>; show help message";
     }
 
     @Override

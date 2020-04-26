@@ -31,9 +31,12 @@ public class InsertIntoBuilder extends CmdBaseBuilder implements CmdBuilder {
     @Override
     public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext sessionContext) {
         final String sql = cmd.args[0];
-        sessionContext.tEnv.sqlUpdate(sql);
-
+        insert(sql, sessionContext);
         result.addMsg("prepare insert into " + SqlSplitUtil.getInsertIntoTableName(sql));
         return result;
+    }
+
+    public static  void insert(String sql, SqlSessionContext sessionContext){
+        sessionContext.tEnv.sqlUpdate(sql);
     }
 }

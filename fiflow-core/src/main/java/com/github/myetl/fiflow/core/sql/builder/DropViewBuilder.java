@@ -17,6 +17,11 @@ public class DropViewBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
+    public String help() {
+        return "drop view xx; drop view xx";
+    }
+
+    @Override
     public BuildLevel buildLevel() {
         return BuildLevel.Create;
     }
@@ -24,6 +29,11 @@ public class DropViewBuilder extends CmdBaseBuilder implements CmdBuilder {
 
     @Override
     public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext sessionContext) {
-        return null;
+        String name = cmd.args[0];
+        sessionContext.tEnv.dropTemporaryView(name);
+
+        result.addMsg("drop view "+name);
+
+        return result;
     }
 }

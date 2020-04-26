@@ -17,12 +17,21 @@ public class DropDatabaseBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
+    public String help() {
+        return "drop database xx; drop database xx";
+    }
+
+    @Override
     public BuildLevel buildLevel() {
-        return BuildLevel.Insert;
+        return BuildLevel.Create;
     }
 
     @Override
     public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext sessionContext) {
-        return null;
+        String sql = cmd.args[0];
+        sessionContext.tEnv.sqlUpdate(sql);
+        result.addMsg(sql);
+
+        return result;
     }
 }

@@ -8,7 +8,7 @@ public class DemoMysql extends DemoBase {
 
     @Override
     public String help() {
-        return "demo mysql; jdbc simple demo";
+        return "<span style='color:green'>demo mysql</span>; jdbc simple demo";
     }
 
     @Override

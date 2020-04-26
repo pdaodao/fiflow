@@ -17,12 +17,19 @@ public class AlterDatabaseBuilder extends CmdBaseBuilder implements CmdBuilder {
     }
 
     @Override
+    public String help() {
+        return "alter database xx; alter database xxx";
+    }
+
+    @Override
     public BuildLevel buildLevel() {
-        return BuildLevel.Insert;
+        return BuildLevel.Create;
     }
 
     @Override
     public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext session) {
-        return null;
+        String sql = cmd.args[0];
+        session.tEnv.sqlUpdate(sql);
+        return result;
     }
 }

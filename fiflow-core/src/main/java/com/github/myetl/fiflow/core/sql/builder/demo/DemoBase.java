@@ -8,9 +8,11 @@ import com.github.myetl.fiflow.core.sql.SqlSessionContext;
 import com.github.myetl.fiflow.core.sql.builder.CmdBaseBuilder;
 
 public abstract class DemoBase extends CmdBaseBuilder implements CmdBuilder {
+    private String name;
 
     public DemoBase(String name) {
         super("demo\\s+" + name + "\\s?");
+        this.name = name; 
     }
 
     @Override
@@ -22,7 +24,7 @@ public abstract class DemoBase extends CmdBaseBuilder implements CmdBuilder {
 
     @Override
     public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext session) {
-        result.table().addHeads(help());
+        result.table().addHeads("demo "+name);
         try {
             result.table().addRow(readText(demoFileName()));
         } catch (Exception e) {

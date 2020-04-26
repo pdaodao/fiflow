@@ -9,7 +9,7 @@ public class DemoKafka extends DemoBase {
 
     @Override
     public String help() {
-        return "demo kafka; read from kafka then sink to mysql simple demo";
+        return "<span style='color:green'>demo kafka</span>; read from kafka then sink to mysql simple demo";
     }
 
     @Override
