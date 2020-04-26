@@ -12,7 +12,7 @@ public abstract class DemoBase extends CmdBaseBuilder implements CmdBuilder {
 
     public DemoBase(String name) {
         super("demo\\s+" + name + "\\s?");
-        this.name = name; 
+        this.name = name;
     }
 
     @Override
