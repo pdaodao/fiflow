@@ -7,6 +7,7 @@
 - fiflow-web      与前端对应的后台
 - fiflow-api      fiflow 对外提供的操作api 
 - fiflow-core     flink 操作的封装
+- fiflow-io       输入 输出 
 - fiflow-runtime  提交任务到flink  local、standalone、yarn 以及与flink集群的交互
 
 ## 如何使用 
@@ -27,9 +28,16 @@
 - 任务管理 
 - 使用 数据源管理功能 取代 create table 操作
 
+## fiflow-io
+- elasticsearch source sink doing 
+- mysql binlog doing 
+- hbase todo 
+- ... todo
+
 ## Thanks 
-- flink 
+- flink
 - zeppelin 
 - spring boot 
+- flinkx 
 - vue 
 - element-ui 

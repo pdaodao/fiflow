@@ -13,6 +13,7 @@
         <module>fiflow-runtime</module>
         <module>fiflow-api</module>
         <module>fiflow-web</module>
+        <module>fiflow-io</module>
     </modules>
 
 
