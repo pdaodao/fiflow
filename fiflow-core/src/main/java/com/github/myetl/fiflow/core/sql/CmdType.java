@@ -1,8 +1,10 @@
 package com.github.myetl.fiflow.core.sql;
 
 import com.github.myetl.fiflow.core.sql.builder.*;
+import com.github.myetl.fiflow.core.sql.builder.demo.DemoElasticsearch;
 import com.github.myetl.fiflow.core.sql.builder.demo.DemoKafka;
 import com.github.myetl.fiflow.core.sql.builder.demo.DemoMysql;
+import com.github.myetl.fiflow.core.sql.builder.demo.DemoMysqlBinlog;
 import com.github.myetl.fiflow.core.sql.builder.frame.*;
 import com.github.myetl.fiflow.core.sql.builder.system.*;
 
@@ -13,6 +15,8 @@ public enum CmdType {
     Help(new HelpBuilder()),
     DemoMysql(new DemoMysql()),
     DemoKafka(new DemoKafka()),
+    DemoElasticsearch(new DemoElasticsearch()),
+    DemoMysqlBinlog(new DemoMysqlBinlog()), 
     Jar(new JarBuilder()),
     Parallelism(new ParallelismBuilder()),
     Flink(new FlinkBuilder()),
