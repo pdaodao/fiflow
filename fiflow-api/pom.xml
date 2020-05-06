@@ -24,6 +24,12 @@
             <version>1.10-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.myetl</groupId>
+            <artifactId>fiflow-elasticsearch7</artifactId>
+            <version>1.10-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
 

@@ -1,0 +1,9 @@
+ CREATE TABLE student (
+    name VARCHAR,
+    age INT,
+   class VARCHAR
+ ) WITH (
+    'connector.type' = 'elasticsearch',
+    'connector.index' = 'student'
+    'connector.hosts' = '127.0.0.1:9200'
+);

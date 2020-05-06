@@ -20,8 +20,8 @@
 
 
 ## 如何运行
-- 后端为基于spring boot的程序，运行 FiflowWebMain 
-- 前端为vue程序 在fiflow-ui目录下 见该 README 
+-  运行  FiflowWebMain 
+-  访问  http://localhost:9090/fiflow 
 
 ## todo 
 - flink 集群管理 
@@ -29,7 +29,7 @@
 - 使用 数据源管理功能 取代 create table 操作
 
 ## fiflow-io
-- elasticsearch source sink doing 
+- elasticsearch source sink doing 50% complete
 - mysql binlog doing 
 - hbase todo 
 - ... todo

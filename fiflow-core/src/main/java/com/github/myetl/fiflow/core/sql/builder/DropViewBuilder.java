@@ -32,7 +32,7 @@ public class DropViewBuilder extends CmdBaseBuilder implements CmdBuilder {
         String name = cmd.args[0];
         sessionContext.tEnv.dropTemporaryView(name);
 
-        result.addMsg("drop view "+name);
+        result.addMsg("drop view " + name);
 
         return result;
     }

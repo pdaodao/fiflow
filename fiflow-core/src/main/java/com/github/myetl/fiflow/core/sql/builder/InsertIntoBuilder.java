@@ -18,6 +18,10 @@ public class InsertIntoBuilder extends CmdBaseBuilder implements CmdBuilder {
         super(pattern);
     }
 
+    public static void insert(String sql, SqlSessionContext sessionContext) {
+        sessionContext.tEnv.sqlUpdate(sql);
+    }
+
     @Override
     public String help() {
         return "insert into; write data and trigger job submit";
@@ -34,9 +38,5 @@ public class InsertIntoBuilder extends CmdBaseBuilder implements CmdBuilder {
         insert(sql, sessionContext);
         result.addMsg("prepare insert into " + SqlSplitUtil.getInsertIntoTableName(sql));
         return result;
-    }
-
-    public static  void insert(String sql, SqlSessionContext sessionContext){
-        sessionContext.tEnv.sqlUpdate(sql);
     }
 }

@@ -29,7 +29,7 @@ public class FlinkUtils {
                 .fromDataTypeToTypeInfo(rowDataType)
                 .createSerializer(new ExecutionConfig());
 
-        InetAddress address = InetAddress.getByName("10.10.70.118");
+        InetAddress address = InetAddress.getByName("127.0.0.1");
         int port = 9092;
 
         System.out.println("-- address " + address.getHostAddress() + ":" + port);

@@ -12,13 +12,15 @@ const getVersion = () => {
 }
 
 module.exports = {
-    outputDir: 'dist/dist',
+    publicPath: '/fiflow',
+    outputDir: 'dist',
+    assetsDir: 'static',
     chainWebpack: (config) => {
         if (process.env.NODE_ENV === 'production') {
             config.plugin('compress').use(FileManagerPlugin, [{
                 onEnd: {
                     copy: [
-                        { source: 'node_modules/monaco-editor/dev/vs', destination: `./dist/dist/static/vs` },
+                        { source: 'node_modules/monaco-editor/dev/vs', destination: `./dist/static/vs` },
                         { source: './config.sh', destination: `./dist` },
                         { source: './install.sh', destination: `./dist` }
                     ],

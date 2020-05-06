@@ -24,7 +24,7 @@ public abstract class DemoBase extends CmdBaseBuilder implements CmdBuilder {
 
     @Override
     public FlinkBuildInfo build(FlinkBuildInfo result, Cmd cmd, SqlSessionContext session) {
-        result.table().addHeads("demo "+name);
+        result.table().addHeads("demo " + name);
         try {
             result.table().addRow(readText(demoFileName()));
         } catch (Exception e) {

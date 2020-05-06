@@ -34,7 +34,7 @@ public class CreateViewBuilder extends CmdBaseBuilder implements CmdBuilder {
         String sql = cmd.args[1];
         Table table = sessionContext.tEnv.sqlQuery(sql);
         sessionContext.tEnv.createTemporaryView(name, table);
-        result.addMsg("create view "+name+" ok ");
+        result.addMsg("create view " + name + " ok ");
         return result;
     }
 }

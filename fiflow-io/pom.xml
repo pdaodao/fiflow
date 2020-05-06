@@ -24,6 +24,14 @@
             <version>1.10-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.myetl</groupId>
+            <artifactId>fiflow-runtime</artifactId>
+            <version>1.10-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
 
 
