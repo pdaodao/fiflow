@@ -16,7 +16,7 @@ public enum CmdType {
     DemoMysql(new DemoMysql()),
     DemoKafka(new DemoKafka()),
     DemoElasticsearch(new DemoElasticsearch()),
-    DemoMysqlBinlog(new DemoMysqlBinlog()), 
+    DemoMysqlBinlog(new DemoMysqlBinlog()),
     Jar(new JarBuilder()),
     Parallelism(new ParallelismBuilder()),
     Flink(new FlinkBuilder()),
