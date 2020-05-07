@@ -1,6 +1,8 @@
 package com.github.myetl.fiflow.io.elasticsearch7;
 
+import com.github.myetl.fiflow.core.io.ExpressionUtils;
 import com.github.myetl.fiflow.core.io.TypeUtils;
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -9,7 +11,6 @@ import org.apache.flink.table.expressions.Expression;
 import org.apache.flink.table.sources.FilterableTableSource;
 import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.sources.TableSource;
-import org.apache.flink.table.utils.TableConnectorUtils;
 import org.apache.flink.types.Row;
 
 import java.util.List;
@@ -20,13 +21,16 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
 
     private final ESOptions esOptions;
     private final TableSchema schema;
-    private final RowTypeInfo returnType;
+    private final RowTypeInfo typeInfo;
+    // 过滤条件部分
+    private final String where;
 
 
-    private ESTableSource(ESOptions esOptions, TableSchema schema) {
+    private ESTableSource(ESOptions esOptions, TableSchema schema, String where) {
         this.esOptions = esOptions;
         this.schema = schema;
-        this.returnType = TypeUtils.toNormalizeRowType(schema);
+        this.typeInfo = TypeUtils.toNormalizeRowType(schema);
+        this.where = where;
     }
 
     public static Builder builder() {
@@ -42,13 +46,14 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
     public DataStream<Row> getDataStream(StreamExecutionEnvironment execEnv) {
         return execEnv.addSource(ESSourceFunction.builder()
                 .setEsOptions(esOptions)
-                .setRowTypeInfo(returnType)
+                .setRowTypeInfo(typeInfo)
+                .setWhere(where)
                 .build()).name(explainSource());
     }
 
     @Override
     public RowTypeInfo getReturnType() {
-        return returnType;
+        return typeInfo;
     }
 
     @Override
@@ -58,26 +63,36 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
 
     @Override
     public String explainSource() {
-        return TableConnectorUtils.generateRuntimeName(getClass(), returnType.getFieldNames());
+        StringBuilder sb = new StringBuilder();
+        String className = this.getClass().getSimpleName();
+        String[] fields = typeInfo.getFieldNames();
+        if (null == fields) {
+            sb.append(className + "(*)");
+        } else {
+            sb.append(className + "(" + String.join(", ", fields) + ")");
+        }
+        sb.append(" from ").append(esOptions.getIndex());
+        if (where != null) {
+            sb.append(" where ").append(where);
+        }
+        return sb.toString();
     }
 
     @Override
     public TableSource<Row> applyPredicate(List<Expression> predicates) {
-
-        System.out.println(predicates.toString());
-
-
-        return this;
+        String where = ExpressionUtils.toWhere(predicates, null);
+        return new ESTableSource(esOptions, schema, where);
     }
 
     @Override
     public boolean isFilterPushedDown() {
-        return false;
+        return where != null;
     }
 
     public static class Builder {
         private ESOptions esOptions;
         private TableSchema schema;
+        private String where;
 
         public Builder setEsOptions(ESOptions esOptions) {
             this.esOptions = esOptions;
@@ -89,6 +104,11 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
             return this;
         }
 
+        public Builder setWhere(String where) {
+            this.where = where;
+            return this;
+        }
+
         /**
          * Finalizes the configuration and checks validity.
          *
@@ -97,7 +117,7 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
         public ESTableSource build() {
             checkNotNull(esOptions, "No EsOptions supplied.");
             checkNotNull(schema, "No schema supplied.");
-            return new ESTableSource(esOptions, schema);
+            return new ESTableSource(esOptions, schema, where);
         }
     }
 }

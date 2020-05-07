@@ -1,6 +1,7 @@
 package com.github.myetl.fiflow.io.elasticsearch7;
 
 import com.github.myetl.fiflow.core.util.Preconditions;
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.annotation.PublicEvolving;
 import org.apache.flink.table.descriptors.ConnectorDescriptor;
 import org.apache.flink.table.descriptors.DescriptorProperties;

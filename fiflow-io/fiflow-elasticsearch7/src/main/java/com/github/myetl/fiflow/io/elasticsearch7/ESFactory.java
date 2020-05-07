@@ -1,5 +1,6 @@
 package com.github.myetl.fiflow.io.elasticsearch7;
 
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.descriptors.DescriptorProperties;

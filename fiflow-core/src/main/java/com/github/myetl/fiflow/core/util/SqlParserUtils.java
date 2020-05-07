@@ -26,22 +26,4 @@ public class SqlParserUtils {
     public static SqlNode parse(String sql) throws SqlParseException {
         return parser.parse(sql);
     }
-
-    public static SqlNode parseWhere(String sql) throws SqlParseException {
-        if (StringUtils.isEmpty(sql)) return null;
-        if (SelectBuilder.pattern.matches(sql)) {
-
-        } else {
-            sql = sql.trim();
-            StringBuilder sb = new StringBuilder();
-            sb.append("select * from t1");
-            sb.append(" where");
-
-            sb.append(" ");
-            sb.append(sql);
-
-            sql = sb.toString();
-        }
-        return ((SqlSelect) parse(sql)).getWhere();
-    }
 }

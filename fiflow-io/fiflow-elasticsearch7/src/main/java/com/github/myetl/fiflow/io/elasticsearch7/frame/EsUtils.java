@@ -1,4 +1,4 @@
-package com.github.myetl.fiflow.io.elasticsearch7;
+package com.github.myetl.fiflow.io.elasticsearch7.frame;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpHost;

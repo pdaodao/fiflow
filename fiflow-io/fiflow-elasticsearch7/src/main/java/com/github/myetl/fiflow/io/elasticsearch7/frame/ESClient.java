@@ -1,7 +1,8 @@
-package com.github.myetl.fiflow.io.elasticsearch7;
+package com.github.myetl.fiflow.io.elasticsearch7.frame;
 
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
-import org.apache.flink.api.java.typeutils.RowTypeInfo;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.types.Row;
 import org.elasticsearch.action.search.ClearScrollRequest;
@@ -11,17 +12,16 @@ import org.elasticsearch.action.search.SearchScrollRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 public class ESClient {
     private final TypeSerializer<Row> serializer;
-    private final String indexName;
+    private final ESOptions esOptions;
 
     private RestHighLevelClient client;
 
@@ -29,28 +29,23 @@ public class ESClient {
     private volatile boolean running = true;
 
 
-    public ESClient(String indexName, TypeSerializer<Row> serializer, String hosts, String username, String password) {
-        this.indexName = indexName;
+    public ESClient(ESOptions esOptions, TypeSerializer<Row> serializer) {
+        this.esOptions = esOptions;
         this.serializer = serializer;
-        this.client = EsUtils.createClient(hosts, username, password);
+        this.client = EsUtils.createClient(esOptions.getHosts(), esOptions.getUsername(), esOptions.getPassword());
     }
 
-    public void scrollSearch(RowTypeInfo rowTypeInfo, Integer shardIndex, SourceFunction.SourceContext<Row> ctx) throws IOException {
+    public void scrollSearch(String queryTemplate, Integer shardIndex, SourceFunction.SourceContext<Row> ctx) throws Exception {
         if (running == false) return;
         scrollId = null;
 
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        Tuple2<SearchRequest, List<String>> build = EsBuilder.build(queryTemplate);
+        SearchRequest searchRequest = build.f0;
+        List<String> selectFields = build.f1;
 
-        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-
-        searchSourceBuilder.fetchSource(rowTypeInfo.getFieldNames(), null);
         // 使用 scroll api 获取数据
         Scroll scroll = new Scroll(TimeValue.timeValueMinutes(3l));
-
-        SearchRequest searchRequest = new SearchRequest();
-        searchRequest.indices(indexName);
         searchRequest.scroll(scroll);
-        searchRequest.source(searchSourceBuilder);
 
         if (shardIndex != null) {
             searchRequest.preference("_shards:" + shardIndex);
@@ -75,7 +70,7 @@ public class ESClient {
                     Map<String, Object> map = hit.getSourceAsMap();
                     Row row = serializer.createInstance();
                     int index = 0;
-                    for (String f : rowTypeInfo.getFieldNames()) {
+                    for (String f : selectFields) {
                         row.setField(index++, map.get(f));
                     }
                     ctx.collect(row);
@@ -102,7 +97,7 @@ public class ESClient {
 
 
     public Integer shards() throws IOException {
-        return EsUtils.shards(client, indexName);
+        return EsUtils.shards(client, esOptions.getIndex());
     }
 
     public void cancel() {

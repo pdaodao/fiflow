@@ -2,6 +2,9 @@ package com.github.myetl.fiflow.io.elasticsearch7;
 
 import com.github.myetl.fiflow.core.io.IOSourceFunction;
 import com.github.myetl.fiflow.core.io.TypeUtils;
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESReadOptions;
+import com.github.myetl.fiflow.io.elasticsearch7.frame.ESClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
@@ -19,11 +22,7 @@ import static org.apache.flink.util.Preconditions.checkNotNull;
 public class ESSourceFunction extends IOSourceFunction {
     private static final Logger LOG = LoggerFactory.getLogger(ESSourceFunction.class);
 
-    private String hosts;
-    private String indexName;
-
-    private String username;
-    private String password;
+    private ESOptions esOptions;
 
     private RowTypeInfo rowTypeInfo;
     private String queryTemplate;
@@ -48,7 +47,7 @@ public class ESSourceFunction extends IOSourceFunction {
     public void run(SourceContext<Row> ctx) throws Exception {
         Integer subIndex = getRuntimeContext().getIndexOfThisSubtask();
         Integer tasks = getRuntimeContext().getNumberOfParallelSubtasks();
-        this.esClient = new ESClient(indexName, serializer, hosts, username, password);
+        this.esClient = new ESClient(esOptions, serializer);
 
         Integer shards = esClient.shards();
         List<Integer> subShards = new ArrayList<>();
@@ -59,8 +58,8 @@ public class ESSourceFunction extends IOSourceFunction {
         }
         for (Integer shard : subShards) {
             if (isRunning == false) break;
-            LOG.info("elasticsearch scroll search {} : shard_{}", indexName, shard);
-            esClient.scrollSearch(rowTypeInfo, shard, ctx);
+            LOG.info("elasticsearch scroll search {} : shard_{}", esOptions.getIndex(), shard);
+            esClient.scrollSearch(queryTemplate, shard, ctx);
         }
         esClient.close();
     }
@@ -91,6 +90,7 @@ public class ESSourceFunction extends IOSourceFunction {
         private ESReadOptions esReadOptions;
         private RowTypeInfo rowTypeInfo;
         private String queryTemplate;
+        private String where;
 
 
         public Builder setEsOptions(ESOptions esOptions) {
@@ -118,6 +118,11 @@ public class ESSourceFunction extends IOSourceFunction {
             return this;
         }
 
+        public Builder setWhere(String where) {
+            this.where = where;
+            return this;
+        }
+
         public ESSourceFunction build() {
             checkNotNull(esOptions, "No options supplied.");
             checkNotNull(rowTypeInfo, "No rowTypeInfo supplied.");
@@ -129,17 +134,18 @@ public class ESSourceFunction extends IOSourceFunction {
                 sb.append("SELECT ");
                 sb.append(StringUtils.join(rowTypeInfo.getFieldNames(), ","));
                 sb.append(" FROM ");
-                sb.append(esOptions.getIndex());
-
+                sb.append("`").append(esOptions.getIndex()).append("`");
+                if (where != null) {
+                    sb.append(" where ").append(where);
+                }
                 queryTemplate = sb.toString();
             }
+            checkNotNull(queryTemplate, "No QueryTemplate supplied.");
 
             ESSourceFunction esSourceFunction = new ESSourceFunction();
-            esSourceFunction.hosts = esOptions.getHosts();
-            esSourceFunction.indexName = esOptions.getIndex();
-            esSourceFunction.username = esOptions.getUsername();
-            esSourceFunction.password = esOptions.getPassword();
+            esSourceFunction.esOptions = esOptions;
             esSourceFunction.rowTypeInfo = rowTypeInfo;
+            esSourceFunction.queryTemplate = queryTemplate;
 
             return esSourceFunction;
         }
