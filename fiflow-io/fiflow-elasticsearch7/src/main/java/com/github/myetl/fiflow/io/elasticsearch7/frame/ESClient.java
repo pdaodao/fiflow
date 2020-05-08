@@ -1,10 +1,10 @@
 package com.github.myetl.fiflow.io.elasticsearch7.frame;
 
 import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
-import org.apache.flink.api.common.typeutils.TypeSerializer;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.types.Row;
+import org.apache.flink.util.Collector;
+import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -20,26 +20,55 @@ import java.util.List;
 import java.util.Map;
 
 public class ESClient {
-    private final TypeSerializer<Row> serializer;
     private final ESOptions esOptions;
-
     private RestHighLevelClient client;
-
     private String scrollId = null;
     private volatile boolean running = true;
 
-
-    public ESClient(ESOptions esOptions, TypeSerializer<Row> serializer) {
+    public ESClient(ESOptions esOptions) {
         this.esOptions = esOptions;
-        this.serializer = serializer;
         this.client = EsUtils.createClient(esOptions.getHosts(), esOptions.getUsername(), esOptions.getPassword());
     }
 
-    public void scrollSearch(String queryTemplate, Integer shardIndex, SourceFunction.SourceContext<Row> ctx) throws Exception {
+    public void search(String queryTemplate, final Collector<Row> collector, boolean isAsync) throws Exception {
+        Tuple2<SearchRequest, List<String>> build = EsPushBuilder.build(queryTemplate);
+        SearchRequest searchRequest = build.f0;
+        List<String> selectFields = build.f1;
+        searchRequest.source().size(10000);
+        if (isAsync) {
+            final CollectListener listener = new CollectListener(collector, selectFields);
+            client.searchAsync(searchRequest, RequestOptions.DEFAULT, listener);
+            return;
+        }
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        processResponse(response, collector, selectFields);
+    }
+
+    private int processResponse(SearchResponse response, Collector<Row> collector, List<String> selectFields) {
+        if (response == null || response.getHits() == null) return 0;
+        SearchHit[] hits = response.getHits().getHits();
+        if (hits == null || hits.length < 1) return 0;
+        int size = 0;
+        for (SearchHit hit : hits) {
+            Map<String, Object> map = hit.getSourceAsMap();
+            Row row = new Row(selectFields.size());
+            int index = 0;
+            for (String f : selectFields) {
+                row.setField(index++, map.get(f));
+            }
+            size++;
+            collector.collect(row);
+        }
+        return size;
+    }
+
+    public void scrollSearch(String queryTemplate, Integer shardIndex, Collector<Row> collector) throws Exception {
         if (running == false) return;
         scrollId = null;
 
-        Tuple2<SearchRequest, List<String>> build = EsBuilder.build(queryTemplate);
+        System.out.println("---  es scroll search --- shard_" + shardIndex + ":" + queryTemplate);
+
+        Tuple2<SearchRequest, List<String>> build = EsPushBuilder.build(queryTemplate);
         SearchRequest searchRequest = build.f0;
         List<String> selectFields = build.f1;
 
@@ -51,10 +80,8 @@ public class ESClient {
             searchRequest.preference("_shards:" + shardIndex);
         }
 
-        SearchHit[] hits = null;
-
         if (running == false) return;
-
+        int bulkSize = 0;
         do {
             SearchResponse searchResponse;
             if (scrollId == null) {
@@ -64,22 +91,12 @@ public class ESClient {
                 searchResponse = client.scroll(new SearchScrollRequest(scrollId), RequestOptions.DEFAULT);
                 scrollId = searchResponse.getScrollId();
             }
-            hits = searchResponse.getHits().getHits();
-            if (hits != null) {
-                for (SearchHit hit : hits) {
-                    Map<String, Object> map = hit.getSourceAsMap();
-                    Row row = serializer.createInstance();
-                    int index = 0;
-                    for (String f : selectFields) {
-                        row.setField(index++, map.get(f));
-                    }
-                    ctx.collect(row);
-                }
-            }
-        } while (running && hits != null && hits.length > 0);
+
+            bulkSize = processResponse(searchResponse, collector, selectFields);
+
+        } while (running && bulkSize > 0);
         clearScroll();
     }
-
 
     private void clearScroll() {
         if (client == null) return;
@@ -95,7 +112,6 @@ public class ESClient {
         }
     }
 
-
     public Integer shards() throws IOException {
         return EsUtils.shards(client, esOptions.getIndex());
     }
@@ -103,7 +119,6 @@ public class ESClient {
     public void cancel() {
         running = false;
     }
-
 
     public void close() {
         running = false;
@@ -118,5 +133,24 @@ public class ESClient {
         client = null;
     }
 
+    public final class CollectListener implements ActionListener<SearchResponse> {
+        private final Collector<Row> collector;
+        private final List<String> selectFields;
 
+        public CollectListener(Collector<Row> collector, List<String> selectFields) {
+            this.collector = collector;
+            this.selectFields = selectFields;
+        }
+
+        @Override
+        public void onResponse(SearchResponse searchResponse) {
+            processResponse(searchResponse, collector, selectFields);
+            collector.close();
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+
+        }
+    }
 }

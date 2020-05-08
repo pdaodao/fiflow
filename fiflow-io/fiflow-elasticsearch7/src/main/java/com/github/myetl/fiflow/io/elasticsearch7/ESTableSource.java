@@ -8,7 +8,10 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.expressions.Expression;
+import org.apache.flink.table.functions.AsyncTableFunction;
+import org.apache.flink.table.functions.TableFunction;
 import org.apache.flink.table.sources.FilterableTableSource;
+import org.apache.flink.table.sources.LookupableTableSource;
 import org.apache.flink.table.sources.StreamTableSource;
 import org.apache.flink.table.sources.TableSource;
 import org.apache.flink.types.Row;
@@ -17,7 +20,7 @@ import java.util.List;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
-public class ESTableSource implements StreamTableSource<Row>, FilterableTableSource<Row> {
+public class ESTableSource implements StreamTableSource<Row>, FilterableTableSource<Row>, LookupableTableSource<Row> {
 
     private final ESOptions esOptions;
     private final TableSchema schema;
@@ -39,6 +42,21 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
 
     @Override
     public boolean isBounded() {
+        return true;
+    }
+
+    @Override
+    public TableFunction<Row> getLookupFunction(String[] lookupKeys) {
+        return new EsLookTableFunction(esOptions, typeInfo, lookupKeys);
+    }
+
+    @Override
+    public AsyncTableFunction<Row> getAsyncLookupFunction(String[] lookupKeys) {
+        return new EsAsyncLookTableFunction(esOptions, typeInfo, lookupKeys);
+    }
+
+    @Override
+    public boolean isAsyncEnabled() {
         return true;
     }
 

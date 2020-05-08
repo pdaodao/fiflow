@@ -11,6 +11,7 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.types.Row;
+import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +48,17 @@ public class ESSourceFunction extends IOSourceFunction {
     public void run(SourceContext<Row> ctx) throws Exception {
         Integer subIndex = getRuntimeContext().getIndexOfThisSubtask();
         Integer tasks = getRuntimeContext().getNumberOfParallelSubtasks();
-        this.esClient = new ESClient(esOptions, serializer);
+        this.esClient = new ESClient(esOptions);
+        Collector<Row> collector = new Collector<Row>() {
+            @Override
+            public void collect(Row record) {
+                ctx.collect(record);
+            }
+
+            @Override
+            public void close() {
+            }
+        };
 
         Integer shards = esClient.shards();
         List<Integer> subShards = new ArrayList<>();
@@ -59,7 +70,7 @@ public class ESSourceFunction extends IOSourceFunction {
         for (Integer shard : subShards) {
             if (isRunning == false) break;
             LOG.info("elasticsearch scroll search {} : shard_{}", esOptions.getIndex(), shard);
-            esClient.scrollSearch(queryTemplate, shard, ctx);
+            esClient.scrollSearch(queryTemplate, shard, collector);
         }
         esClient.close();
     }

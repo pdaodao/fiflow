@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EsBuilder {
+public class EsPushBuilder {
 
 
     public static Tuple2<SearchRequest, List<String>> build(String sql) throws Exception {
