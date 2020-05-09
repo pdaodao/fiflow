@@ -5,6 +5,7 @@ import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.types.Row;
 import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -27,7 +28,6 @@ import java.util.Map;
 public class ESClient {
     private static final Logger LOG = LoggerFactory.getLogger(ESClient.class);
 
-
     private final ESOptions esOptions;
     private RestHighLevelClient client;
     private String scrollId = null;
@@ -36,6 +36,18 @@ public class ESClient {
     public ESClient(ESOptions esOptions) {
         this.esOptions = esOptions;
         this.client = ESUtils.createClient(esOptions.getHosts(), esOptions.getUsername(), esOptions.getPassword());
+    }
+
+    /**
+     * bulk 处理器
+     *
+     * @param listener
+     * @return
+     */
+    public BulkProcessor initBulk(BulkProcessor.Listener listener) {
+        return BulkProcessor.builder(
+                (request, bulkListener) -> client.bulkAsync(request, RequestOptions.DEFAULT, bulkListener),
+                listener).build();
     }
 
     /**
