@@ -5,6 +5,9 @@ import java.util.Optional;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
 
+/**
+ * elasticsearch 连接信息
+ */
 public class ESOptions implements Serializable {
     // 127.0.0.1:9200,127.0.0.2:9200
     private String hosts;

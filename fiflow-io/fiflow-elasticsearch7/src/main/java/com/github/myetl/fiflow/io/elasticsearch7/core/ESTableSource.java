@@ -1,8 +1,7 @@
-package com.github.myetl.fiflow.io.elasticsearch7;
+package com.github.myetl.fiflow.io.elasticsearch7.core;
 
-import com.github.myetl.fiflow.core.io.ExpressionUtils;
+import com.github.myetl.fiflow.core.io.PushExpressionUtils;
 import com.github.myetl.fiflow.core.io.TypeUtils;
-import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -47,12 +46,12 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
 
     @Override
     public TableFunction<Row> getLookupFunction(String[] lookupKeys) {
-        return new EsLookTableFunction(esOptions, typeInfo, lookupKeys);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public AsyncTableFunction<Row> getAsyncLookupFunction(String[] lookupKeys) {
-        return new EsAsyncLookTableFunction(esOptions, typeInfo, lookupKeys);
+        return new ESAsyncLookupFun(esOptions, typeInfo, lookupKeys);
     }
 
     @Override
@@ -98,7 +97,7 @@ public class ESTableSource implements StreamTableSource<Row>, FilterableTableSou
 
     @Override
     public TableSource<Row> applyPredicate(List<Expression> predicates) {
-        String where = ExpressionUtils.toWhere(predicates, null);
+        String where = PushExpressionUtils.toWhere(predicates, null);
         return new ESTableSource(esOptions, schema, where);
     }
 

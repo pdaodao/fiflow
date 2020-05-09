@@ -1,9 +1,8 @@
-package com.github.myetl.fiflow.io.elasticsearch7;
+package com.github.myetl.fiflow.io.elasticsearch7.core;
 
 import com.github.myetl.fiflow.core.io.IOSourceFunction;
+import com.github.myetl.fiflow.core.io.RowCollector;
 import com.github.myetl.fiflow.core.io.TypeUtils;
-import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
-import com.github.myetl.fiflow.io.elasticsearch7.core.ESReadOptions;
 import com.github.myetl.fiflow.io.elasticsearch7.frame.ESClient;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.common.typeutils.TypeSerializer;
@@ -11,7 +10,6 @@ import org.apache.flink.api.java.typeutils.RowTypeInfo;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.types.Row;
-import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,14 +47,10 @@ public class ESSourceFunction extends IOSourceFunction {
         Integer subIndex = getRuntimeContext().getIndexOfThisSubtask();
         Integer tasks = getRuntimeContext().getNumberOfParallelSubtasks();
         this.esClient = new ESClient(esOptions);
-        Collector<Row> collector = new Collector<Row>() {
+        final RowCollector collector = new RowCollector() {
             @Override
             public void collect(Row record) {
                 ctx.collect(record);
-            }
-
-            @Override
-            public void close() {
             }
         };
 

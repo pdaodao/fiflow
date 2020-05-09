@@ -1,6 +1,7 @@
 package com.github.myetl.fiflow.io.elasticsearch7;
 
 import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
+import com.github.myetl.fiflow.io.elasticsearch7.core.ESTableSource;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.descriptors.DescriptorProperties;
@@ -84,8 +85,6 @@ public class ESFactory implements
     }
 
     private ESOptions getESOptions(DescriptorProperties descriptorProperties) {
-
-
         return ESOptions.builder()
                 .setHosts(descriptorProperties.getString(CONNECTOR_HOSTS))
                 .setIndex(descriptorProperties.getString(CONNECTOR_INDEX))

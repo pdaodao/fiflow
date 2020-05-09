@@ -1,9 +1,9 @@
 package com.github.myetl.fiflow.io.elasticsearch7.frame;
 
+import com.github.myetl.fiflow.core.io.RowCollector;
 import com.github.myetl.fiflow.io.elasticsearch7.core.ESOptions;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.types.Row;
-import org.apache.flink.util.Collector;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.search.ClearScrollRequest;
 import org.elasticsearch.action.search.SearchRequest;
@@ -14,12 +14,20 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 连接 elasticsearch 的客户端 和 相关操作
+ */
 public class ESClient {
+    private static final Logger LOG = LoggerFactory.getLogger(ESClient.class);
+
+
     private final ESOptions esOptions;
     private RestHighLevelClient client;
     private String scrollId = null;
@@ -27,11 +35,20 @@ public class ESClient {
 
     public ESClient(ESOptions esOptions) {
         this.esOptions = esOptions;
-        this.client = EsUtils.createClient(esOptions.getHosts(), esOptions.getUsername(), esOptions.getPassword());
+        this.client = ESUtils.createClient(esOptions.getHosts(), esOptions.getUsername(), esOptions.getPassword());
     }
 
-    public void search(String queryTemplate, final Collector<Row> collector, boolean isAsync) throws Exception {
-        Tuple2<SearchRequest, List<String>> build = EsPushBuilder.build(queryTemplate);
+    /**
+     * 普通方式查询数据 用在 Lookup 时 单次最大获取 1w 条数据
+     *
+     * @param queryTemplate sql
+     * @param isAsync       是否异步
+     * @param collector     结果收集器
+     * @throws Exception
+     */
+    public void search(final String queryTemplate, final boolean isAsync, final RowCollector collector) throws Exception {
+        LOG.info("es search : {}", queryTemplate);
+        Tuple2<SearchRequest, List<String>> build = EsSqlBuilder.build(queryTemplate);
         SearchRequest searchRequest = build.f0;
         List<String> selectFields = build.f1;
         searchRequest.source().size(10000);
@@ -44,31 +61,19 @@ public class ESClient {
         processResponse(response, collector, selectFields);
     }
 
-    private int processResponse(SearchResponse response, Collector<Row> collector, List<String> selectFields) {
-        if (response == null || response.getHits() == null) return 0;
-        SearchHit[] hits = response.getHits().getHits();
-        if (hits == null || hits.length < 1) return 0;
-        int size = 0;
-        for (SearchHit hit : hits) {
-            Map<String, Object> map = hit.getSourceAsMap();
-            Row row = new Row(selectFields.size());
-            int index = 0;
-            for (String f : selectFields) {
-                row.setField(index++, map.get(f));
-            }
-            size++;
-            collector.collect(row);
-        }
-        return size;
-    }
-
-    public void scrollSearch(String queryTemplate, Integer shardIndex, Collector<Row> collector) throws Exception {
+    /**
+     * scroll 方式获取大量数据
+     *
+     * @param queryTemplate
+     * @param shardIndex
+     * @param collector
+     * @throws Exception
+     */
+    public void scrollSearch(String queryTemplate, Integer shardIndex, RowCollector collector) throws Exception {
         if (running == false) return;
         scrollId = null;
-
-        System.out.println("---  es scroll search --- shard_" + shardIndex + ":" + queryTemplate);
-
-        Tuple2<SearchRequest, List<String>> build = EsPushBuilder.build(queryTemplate);
+        LOG.info("es scroll search shard_{} : {}", shardIndex, queryTemplate);
+        Tuple2<SearchRequest, List<String>> build = EsSqlBuilder.build(queryTemplate);
         SearchRequest searchRequest = build.f0;
         List<String> selectFields = build.f1;
 
@@ -86,16 +91,39 @@ public class ESClient {
             SearchResponse searchResponse;
             if (scrollId == null) {
                 searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-                scrollId = searchResponse.getScrollId();
             } else {
                 searchResponse = client.scroll(new SearchScrollRequest(scrollId), RequestOptions.DEFAULT);
-                scrollId = searchResponse.getScrollId();
             }
-
+            scrollId = searchResponse.getScrollId();
             bulkSize = processResponse(searchResponse, collector, selectFields);
-
         } while (running && bulkSize > 0);
         clearScroll();
+    }
+
+    /**
+     * 把 搜索结果转为 Row
+     *
+     * @param response     搜索结果
+     * @param collector    收集器
+     * @param selectFields 字段列表
+     * @return
+     */
+    private int processResponse(SearchResponse response, RowCollector collector, List<String> selectFields) {
+        if (response == null || response.getHits() == null) return 0;
+        SearchHit[] hits = response.getHits().getHits();
+        if (hits == null || hits.length < 1) return 0;
+        int size = 0;
+        for (SearchHit hit : hits) {
+            Map<String, Object> map = hit.getSourceAsMap();
+            Row row = new Row(selectFields.size());
+            int index = 0;
+            for (String f : selectFields) {
+                row.setField(index++, map.get(f));
+            }
+            size++;
+            collector.collect(row);
+        }
+        return size;
     }
 
     private void clearScroll() {
@@ -112,8 +140,14 @@ public class ESClient {
         }
     }
 
+    /**
+     * 获取分片数
+     *
+     * @return
+     * @throws IOException
+     */
     public Integer shards() throws IOException {
-        return EsUtils.shards(client, esOptions.getIndex());
+        return ESUtils.shards(client, esOptions.getIndex());
     }
 
     public void cancel() {
@@ -134,10 +168,10 @@ public class ESClient {
     }
 
     public final class CollectListener implements ActionListener<SearchResponse> {
-        private final Collector<Row> collector;
+        private final RowCollector collector;
         private final List<String> selectFields;
 
-        public CollectListener(Collector<Row> collector, List<String> selectFields) {
+        public CollectListener(RowCollector collector, List<String> selectFields) {
             this.collector = collector;
             this.selectFields = selectFields;
         }
@@ -145,12 +179,12 @@ public class ESClient {
         @Override
         public void onResponse(SearchResponse searchResponse) {
             processResponse(searchResponse, collector, selectFields);
-            collector.close();
+            collector.complete();
         }
 
         @Override
         public void onFailure(Exception e) {
-
+            collector.error(e);
         }
     }
 }

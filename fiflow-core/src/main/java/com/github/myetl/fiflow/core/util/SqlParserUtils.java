@@ -1,12 +1,9 @@
 package com.github.myetl.fiflow.core.util;
 
-import com.github.myetl.fiflow.core.sql.builder.SelectBuilder;
 import org.apache.calcite.config.Lex;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.SqlSelect;
 import org.apache.calcite.sql.parser.SqlParseException;
 import org.apache.calcite.sql.parser.SqlParser;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.sql.parser.impl.FlinkSqlParserImpl;
 import org.apache.flink.sql.parser.validate.FlinkSqlConformance;
 import org.apache.flink.table.planner.calcite.CalciteParser;

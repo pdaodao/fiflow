@@ -22,10 +22,10 @@ public enum Operator {
         this.opt = opt;
     }
 
-    public static Operator parse(String name){
-        try{
+    public static Operator parse(String name) {
+        try {
             return Operator.valueOf(name);
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
         return null;
@@ -38,19 +38,19 @@ public enum Operator {
         return sb.toString();
     }
 
-    private List<Object> parseArgs(List<Expression> args){
-        List<Object> ret  = new ArrayList<>(args.size());
-        for(Expression exp : args){
-            if(exp instanceof FieldReferenceExpression){
+    private List<Object> parseArgs(List<Expression> args) {
+        List<Object> ret = new ArrayList<>(args.size());
+        for (Expression exp : args) {
+            if (exp instanceof FieldReferenceExpression) {
                 ret.add(((FieldReferenceExpression) exp).getName());
                 continue;
             }
 
-            if(exp instanceof ValueLiteralExpression){
+            if (exp instanceof ValueLiteralExpression) {
                 ValueLiteralExpression vv = (ValueLiteralExpression) exp;
-                if(vv.isNull()){
+                if (vv.isNull()) {
                     ret.add(null);
-                }else{
+                } else {
                     ret.add(vv.getValueAs(vv.getOutputDataType().getConversionClass()).get());
                 }
             }

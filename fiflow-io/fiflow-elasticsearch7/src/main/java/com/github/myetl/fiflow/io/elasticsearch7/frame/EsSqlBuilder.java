@@ -14,9 +14,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EsPushBuilder {
+public class EsSqlBuilder {
 
-
+    /**
+     * 使用 sql 构建查询请求
+     *
+     * @param sql
+     * @return
+     * @throws Exception
+     */
     public static Tuple2<SearchRequest, List<String>> build(String sql) throws Exception {
         SqlNode sqlNode = SqlParserUtils.parse(sql);
 
@@ -48,6 +54,12 @@ public class EsPushBuilder {
         return new Tuple2<>(searchRequest, selectFields);
     }
 
+    /**
+     * 把 sql 的 查询条件 转为 elasticsearch 的查询语言
+     *
+     * @param where
+     * @return
+     */
     private static QueryBuilder buildWhere(SqlNode where) {
         if (where == null || !(where instanceof SqlBasicCall)) {
             return null;
