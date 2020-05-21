@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>fiflow</artifactId>
-        <groupId>com.github.myetl</groupId>
+        <groupId>com.github.lessonone</groupId>
         <version>1.10-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,19 +13,19 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.myetl</groupId>
+            <groupId>com.github.lessonone</groupId>
             <artifactId>fiflow-core</artifactId>
             <version>1.10-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.myetl</groupId>
+            <groupId>com.github.lessonone</groupId>
             <artifactId>fiflow-runtime</artifactId>
             <version>1.10-SNAPSHOT</version>
         </dependency>
 
         <dependency>
-            <groupId>com.github.myetl</groupId>
+            <groupId>com.github.lessonone</groupId>
             <artifactId>fiflow-elasticsearch7</artifactId>
             <version>1.10-SNAPSHOT</version>
         </dependency>
