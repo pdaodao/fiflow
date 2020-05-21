@@ -13,7 +13,7 @@
 
 - demo mysql    :  jdbc 示例
 - demo kafka    :  kafka 示例
-- demo elasticsearch : elasticsearch 示例 doing
+- demo elasticsearch : elasticsearch 示例
 - demo mysql-binlog :  mysql-binlog 示例 doing
 
 ## 模块划分
@@ -32,7 +32,7 @@
 
 ## fiflow-io
 - [Elasticsearch](./fiflow-io/fiflow-elasticsearch7/README.md) 读写
-    >  支持谓词下推和异步纬表join, 按 shard 分片读取数据 
+    >  支持谓词下推和异步纬表join, 按 shard 分片读取数据  
        支持append和retract写(90% complete)
     
 - mysql binlog doing 

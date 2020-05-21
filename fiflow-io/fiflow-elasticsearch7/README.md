@@ -34,7 +34,7 @@ CREATE TABLE stuout (
 	class VARCHAR
 ) WITH ( 
     'connector.type' = 'elasticsearch', 
-    'connector.hosts' = '10.10.77.115:9400', 
+    'connector.hosts' = '127.0.0.1:9200', 
     'connector.index' = 'stuout' 
 )
 ```

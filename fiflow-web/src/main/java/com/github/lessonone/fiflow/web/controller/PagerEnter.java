@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class PagerEnter {
 
     @GetMapping({"", "/index"})
-    public String index(){
+    public String index() {
         return "/static/index.html";
     }
 }
