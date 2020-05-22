@@ -25,11 +25,6 @@
 - fiflow-runtime  提交任务到flink  local、standalone、yarn 以及与flink集群的交互
 
 
-## todo 
-- flink 集群管理 
-- 任务管理 
-- 使用 数据源管理功能 取代 create table 操作
-
 ## fiflow-io
 - [Elasticsearch](./fiflow-io/fiflow-elasticsearch7/README.md) 读写
     >  支持谓词下推和异步纬表join, 按 shard 分片读取数据  
@@ -38,6 +33,12 @@
 - mysql binlog doing 
 - hbase todo 
 - ... todo
+
+
+## todo 
+- flink 集群管理 
+- 任务管理 
+- 使用 数据源管理功能 取代 create table 操作
 
 ## Thanks 
 - flink
