@@ -27,7 +27,7 @@
 
 ## fiflow-io
 - [Elasticsearch](./fiflow-io/fiflow-elasticsearch7/README.md) 读写
-    >  支持谓词下推和异步纬表join, 按 shard 分片读取数据  
+    >  支持谓词下推和异步维表join, 按 shard 分片读取数据  
        支持append和retract写(90% complete)
     
 - mysql binlog doing 
@@ -35,7 +35,7 @@
 - ... todo
 
 
-## todo 
+## todo
 - flink 集群管理 
 - 任务管理 
 - 使用 数据源管理功能 取代 create table 操作
