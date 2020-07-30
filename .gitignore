@@ -21,9 +21,6 @@ yarn-error.log*
 *.sw?
 # Compiled class file
 .idea
-*test.md
-*Test.java
-*test
 /.idea/*
 .vertx/
 target/

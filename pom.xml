@@ -7,30 +7,64 @@
     <groupId>com.github.lessonone</groupId>
     <artifactId>fiflow</artifactId>
     <packaging>pom</packaging>
-    <version>1.10-SNAPSHOT</version>
+    <version>1.11-SNAPSHOT</version>
+
     <modules>
-        <module>fiflow-core</module>
-        <module>fiflow-runtime</module>
-        <module>fiflow-api</module>
-        <module>fiflow-web</module>
+        <module>fiflow-common</module>
         <module>fiflow-io</module>
+        <module>fiflow-core</module>
+        <module>fiflow-web</module>
+        <module>fiflow-ui</module>
     </modules>
 
 
     <properties>
-        <flink.version>1.10.0</flink.version>
+        <fiflow.version>1.11-SNAPSHOT</fiflow.version>
+        <spring.boot.version>2.3.1.RELEASE</spring.boot.version>
+        <flink.version>1.11.0</flink.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
         <scala.binary.version>2.11</scala.binary.version>
         <scala.version>2.11.7</scala.version>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.47</version>
-        </dependency>
-    </dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lessonone</groupId>
+                <artifactId>fiflow-common</artifactId>
+                <version>${fiflow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lessonone</groupId>
+                <artifactId>fiflow-io</artifactId>
+                <version>${fiflow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lessonone</groupId>
+                <artifactId>fiflow-core</artifactId>
+                <version>${fiflow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lessonone</groupId>
+                <artifactId>fiflow-web</artifactId>
+                <version>${fiflow.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.47</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 
     <build>
