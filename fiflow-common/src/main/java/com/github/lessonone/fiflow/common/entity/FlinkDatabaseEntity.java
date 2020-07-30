@@ -5,8 +5,8 @@ package com.github.lessonone.fiflow.common.entity;
  */
 public class FlinkDatabaseEntity {
     public static final String TableName = "fi_flink_database";
-    public static final String SqlSelectByCatalog = "SELECT id, catalog, name, properties, comment FROM "+TableName+" WHERE catalog = ?";
-    public static final String SqlDeleteByCatalogAndDatabase = "DELETE FROM "+TableName+" WHERE catalog = ? AND name = ?";
+    public static final String SqlSelectByCatalog = "SELECT id, catalog, name, properties, comment FROM " + TableName + " WHERE catalog = ?";
+    public static final String SqlDeleteByCatalogAndDatabase = "DELETE FROM " + TableName + " WHERE catalog = ? AND name = ?";
 
     private Long id;
     private String catalog;

@@ -4,14 +4,12 @@ import com.github.lessonone.fiflow.common.FlinkMetaCatalog;
 import com.github.lessonone.fiflow.common.base.DbInfo;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.TableResult;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
-
 
 
 public class MetaCatalogTest {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings bsSettings = EnvironmentSettings.newInstance()
                 .useBlinkPlanner()
@@ -24,7 +22,7 @@ public class MetaCatalogTest {
         tEnv.useCatalog("meta");
         metaCatalog.addDbInfo("115",
                 new DbInfo().setUrl("jdbc:mysql://10.10.77.115:3306/nani")
-                .setUsername("root").setPassword("root"));
+                        .setUsername("root").setPassword("root"));
         tEnv.useDatabase("115");
 
 
@@ -33,7 +31,7 @@ public class MetaCatalogTest {
 
 
         String insert = "insert into stuout(name, age, class) \n" +
-                "   select name, cast (age as char) age, class from student where age > 16";
+                "   select name, age, class from student where age > 16";
 
         tEnv.executeSql(insert);
     }

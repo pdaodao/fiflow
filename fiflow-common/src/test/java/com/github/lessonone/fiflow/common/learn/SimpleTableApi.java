@@ -11,7 +11,7 @@ import static org.apache.flink.table.api.Expressions.$;
 
 public class SimpleTableApi {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings bsSettings = EnvironmentSettings.newInstance()
@@ -34,7 +34,7 @@ public class SimpleTableApi {
         System.out.println(table.explain());
 
 
-        for(String t : tEnv.listModules()){
+        for (String t : tEnv.listModules()) {
             System.out.println(t);
         }
 

@@ -13,7 +13,7 @@ public class JSON {
 
 
     public static String toString(Object obj) throws JsonProcessingException {
-        if(obj == null) return null;
+        if (obj == null) return null;
         return objectMapper.writeValueAsString(obj);
     }
 }

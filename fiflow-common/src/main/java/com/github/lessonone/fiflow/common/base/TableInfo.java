@@ -24,7 +24,7 @@ public class TableInfo {
         this.comment = comment;
     }
 
-    public TableColumn addColumn(String name,  String type, String comment){
+    public TableColumn addColumn(String name, String type, String comment) {
         TableColumn column = new TableColumn();
         column.name = name;
         column.type = type;
@@ -33,7 +33,7 @@ public class TableInfo {
         return column;
     }
 
-    public TableInfo addPrimaryKey(String pkName, String pkColumn){
+    public TableInfo addPrimaryKey(String pkName, String pkColumn) {
         this.primaryKeyName = pkName;
         this.primaryKeyColumns.add(pkColumn);
         return this;
@@ -70,7 +70,7 @@ public class TableInfo {
                 .toString();
     }
 
-    public static class TableColumn{
+    public static class TableColumn {
         private String name;
         private String type;
         private String comment;
@@ -134,13 +134,13 @@ public class TableInfo {
             return this;
         }
 
+        public Boolean getAutoincrement() {
+            return autoincrement;
+        }
+
         public TableColumn setAutoincrement(Boolean autoincrement) {
             this.autoincrement = autoincrement;
             return this;
-        }
-
-        public Boolean getAutoincrement() {
-            return autoincrement;
         }
 
         public Boolean getNullable() {

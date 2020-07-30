@@ -1,8 +1,8 @@
 package com.github.lessonone.fiflow.common.meta;
 
-import com.github.lessonone.fiflow.common.base.FunctionWithException;
 import com.github.lessonone.fiflow.common.MetaReader;
 import com.github.lessonone.fiflow.common.base.DbInfo;
+import com.github.lessonone.fiflow.common.base.FunctionWithException;
 import com.github.lessonone.fiflow.common.base.TableInfo;
 import com.github.lessonone.fiflow.common.exception.MetaException;
 import com.github.lessonone.fiflow.common.utils.DbUtils;
@@ -17,18 +17,18 @@ import java.util.List;
 
 
 public class JdbcBaseMetaReader implements MetaReader {
-    private final DbInfo dbInfo;
-    private DataSource dataSource = null;
     public static final String[] TABLES_ONLY = {"TABLE"};
     public static final String[] TABLES_AND_VIEWS = {"TABLE", "VIEW"};
+    private final DbInfo dbInfo;
+    private DataSource dataSource = null;
 
 
     public JdbcBaseMetaReader(DbInfo dbInfo) {
         this.dbInfo = dbInfo;
     }
 
-    protected DataSource getDatasource(){
-        if(dataSource != null) return dataSource;
+    protected DataSource getDatasource() {
+        if (dataSource != null) return dataSource;
         dataSource = DbUtils.createDatasource(dbInfo);
         return dataSource;
     }
@@ -38,7 +38,7 @@ public class JdbcBaseMetaReader implements MetaReader {
     }
 
     public String getCatalog() {
-       return wrap(Connection::getCatalog);
+        return wrap(Connection::getCatalog);
     }
 
     public String getSchema() {
@@ -46,11 +46,11 @@ public class JdbcBaseMetaReader implements MetaReader {
     }
 
     protected <R> R wrap(FunctionWithException<Connection, R> f) throws MetaException {
-        try(Connection conn = getConnection()) {
-             return f.apply(conn);
-        }catch (SQLException e){
+        try (Connection conn = getConnection()) {
+            return f.apply(conn);
+        } catch (SQLException e) {
             throw new MetaException(e.getMessage(), e);
-        }catch (Exception e2){
+        } catch (Exception e2) {
             throw new MetaException(e2.getMessage(), e2);
         }
     }
@@ -59,7 +59,7 @@ public class JdbcBaseMetaReader implements MetaReader {
     public String info() throws MetaException {
         return wrap(conn -> {
             DatabaseMetaData meta = conn.getMetaData();
-            return meta.getDatabaseProductName()+":"+meta.getDatabaseProductVersion();
+            return meta.getDatabaseProductName() + ":" + meta.getDatabaseProductVersion();
         });
     }
 
@@ -67,8 +67,8 @@ public class JdbcBaseMetaReader implements MetaReader {
     public List<String> listDatabases() throws MetaException {
         return wrap(connection -> {
             List<String> dbs = new ArrayList<>();
-            try(ResultSet rs = connection.getMetaData().getCatalogs()){
-                while(rs.next()){
+            try (ResultSet rs = connection.getMetaData().getCatalogs()) {
+                while (rs.next()) {
                     dbs.add(rs.getString(1));
                 }
             }
@@ -80,8 +80,8 @@ public class JdbcBaseMetaReader implements MetaReader {
     public List<String> listSchemas() throws MetaException {
         return wrap(connection -> {
             List<String> dbs = new ArrayList<>();
-            try(ResultSet rs = connection.getMetaData().getSchemas()){
-                while(rs.next()){
+            try (ResultSet rs = connection.getMetaData().getSchemas()) {
+                while (rs.next()) {
                     dbs.add(rs.getString(1));
                 }
             }
@@ -95,8 +95,8 @@ public class JdbcBaseMetaReader implements MetaReader {
         return wrap(connection -> {
             List<String> tables = new ArrayList<>();
             DatabaseMetaData metaData = connection.getMetaData();
-            try(ResultSet rs = metaData.getTables(getCatalog(), getSchema(), null, TABLES_ONLY )){
-                while(rs.next()){
+            try (ResultSet rs = metaData.getTables(getCatalog(), getSchema(), null, TABLES_ONLY)) {
+                while (rs.next()) {
                     String name = rs.getString("TABLE_NAME");
                     String remarks = rs.getString("REMARKS");
                     tables.add(name);
@@ -111,30 +111,30 @@ public class JdbcBaseMetaReader implements MetaReader {
         return wrap(connection -> {
             TableInfo tableInfo = new TableInfo(tableName);
             DatabaseMetaData metaData = connection.getMetaData();
-            try(ResultSet rs = metaData.getColumns(getCatalog(), getSchema(), tableName, null)){
-                while(rs.next()){
+            try (ResultSet rs = metaData.getColumns(getCatalog(), getSchema(), tableName, null)) {
+                while (rs.next()) {
                     TableInfo.TableColumn column = tableInfo.addColumn(rs.getString("COLUMN_NAME"),
                             rs.getString("TYPE_NAME"), rs.getString("REMARKS"));
                     column.setSize(rs.getInt("COLUMN_SIZE"));
                     column.setDigits(rs.getInt("DECIMAL_DIGITS"));
                     column.setPosition(rs.getInt("ORDINAL_POSITION"));
                     String autoincrement = rs.getString("IS_AUTOINCREMENT");
-                    if("NO".equals(autoincrement)){
+                    if ("NO".equals(autoincrement)) {
                         column.setAutoincrement(false);
-                    }else{
+                    } else {
                         column.setAutoincrement(true);
                     }
                     String nullable = rs.getString("IS_NULLABLE");
-                    if("NO".equals(nullable)){
+                    if ("NO".equals(nullable)) {
                         column.setNullable(false);
-                    }else{
+                    } else {
                         column.setNullable(true);
                     }
                 }
             }
 
-            try(ResultSet rs = metaData.getPrimaryKeys(getCatalog(), getSchema(), tableName)){
-                while(rs.next()){
+            try (ResultSet rs = metaData.getPrimaryKeys(getCatalog(), getSchema(), tableName)) {
+                while (rs.next()) {
                     String field = rs.getString("COLUMN_NAME");
                     String pkName = rs.getString("PK_NAME");
                     tableInfo.addPrimaryKey(pkName, field);

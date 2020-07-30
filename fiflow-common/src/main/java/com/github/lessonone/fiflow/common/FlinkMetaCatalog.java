@@ -1,10 +1,10 @@
 package com.github.lessonone.fiflow.common;
 
+import com.github.lessonone.fiflow.common.base.DbInfo;
 import com.github.lessonone.fiflow.common.base.TableInfo;
 import com.github.lessonone.fiflow.common.catalog.FlinkCatalogDatabase;
-import com.github.lessonone.fiflow.common.meta.DispatchMetaReader;
-import com.github.lessonone.fiflow.common.base.DbInfo;
 import com.github.lessonone.fiflow.common.exception.AutoMetaNotSupportException;
+import com.github.lessonone.fiflow.common.meta.DispatchMetaReader;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
@@ -38,7 +38,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
     }
 
     public void addDbInfo(String flinkDatabaseName, DbInfo dbInfo) throws DatabaseAlreadyExistException {
-        if(databases.containsKey(flinkDatabaseName)) {
+        if (databases.containsKey(flinkDatabaseName)) {
             throw new DatabaseAlreadyExistException(getName(), flinkDatabaseName);
         }
         databases.put(flinkDatabaseName, dbInfo);
@@ -64,7 +64,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
     @Override
     public CatalogDatabase getDatabase(String databaseName) throws DatabaseNotExistException, CatalogException {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName));
-        if(backedCatalog.databaseExists(databaseName)){
+        if (backedCatalog.databaseExists(databaseName)) {
             return backedCatalog.getDatabase(databaseName);
         }
         return new FlinkCatalogDatabase(null, new HashMap<>(), null).setCatalog(getName());
@@ -73,9 +73,9 @@ public class FlinkMetaCatalog extends AbstractCatalog {
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName));
-        if(this.databases.containsKey(databaseName))
+        if (this.databases.containsKey(databaseName))
             return true;
-        if(backedCatalog.databaseExists(databaseName))
+        if (backedCatalog.databaseExists(databaseName))
             return true;
         return false;
     }
@@ -99,14 +99,14 @@ public class FlinkMetaCatalog extends AbstractCatalog {
     @Override
     public List<String> listTables(String databaseName) throws DatabaseNotExistException, CatalogException {
         List<String> tables = new ArrayList<>();
-        if(backedCatalog.databaseExists(databaseName)){
+        if (backedCatalog.databaseExists(databaseName)) {
             tables.addAll(backedCatalog.listTables(databaseName));
         }
-        if(this.databases.containsKey(databaseName)){
-            try{
+        if (this.databases.containsKey(databaseName)) {
+            try {
                 tables.addAll(dispatchMetaReader.getMetaReader(this.databases.get(databaseName)).listTables());
-            }catch (AutoMetaNotSupportException e){
-                if(CollectionUtils.isNotEmpty(tables)) return tables;
+            } catch (AutoMetaNotSupportException e) {
+                if (CollectionUtils.isNotEmpty(tables)) return tables;
                 throw e;
             }
         }
@@ -120,10 +120,10 @@ public class FlinkMetaCatalog extends AbstractCatalog {
 
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
-        if(backedCatalog.tableExists(tablePath)){
+        if (backedCatalog.tableExists(tablePath)) {
             return backedCatalog.getTable(tablePath);
         }
-        if(!this.databases.containsKey(tablePath.getDatabaseName())){
+        if (!this.databases.containsKey(tablePath.getDatabaseName())) {
             throw new TableNotExistException(getName(), tablePath, new DatabaseNotExistException(getName(), tablePath.getDatabaseName()));
         }
         return dispatchMetaReader.getTable(this.databases.get(tablePath.getDatabaseName()), tablePath);
@@ -131,15 +131,15 @@ public class FlinkMetaCatalog extends AbstractCatalog {
 
     @Override
     public boolean tableExists(ObjectPath tablePath) throws CatalogException {
-        if(backedCatalog.tableExists(tablePath)){
+        if (backedCatalog.tableExists(tablePath)) {
             return true;
         }
-        if(!this.databases.containsKey(tablePath.getDatabaseName())){
+        if (!this.databases.containsKey(tablePath.getDatabaseName())) {
             return false;
         }
         TableInfo tableInfo = dispatchMetaReader.getMetaReader(databases.get(tablePath.getDatabaseName()))
                 .getTable(tablePath.getObjectName());
-        if(tableInfo != null && CollectionUtils.isNotEmpty(tableInfo.getColumns())){
+        if (tableInfo != null && CollectionUtils.isNotEmpty(tableInfo.getColumns())) {
             return true;
         }
         return false;
@@ -147,7 +147,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
 
     @Override
     public void dropTable(ObjectPath tablePath, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-        if(backedCatalog.tableExists(tablePath)){
+        if (backedCatalog.tableExists(tablePath)) {
             backedCatalog.dropTable(tablePath, ignoreIfNotExists);
         }
         throw new UnsupportedOperationException();
@@ -165,7 +165,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
 
     @Override
     public void alterTable(ObjectPath tablePath, CatalogBaseTable newTable, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-        if(backedCatalog.tableExists(tablePath)){
+        if (backedCatalog.tableExists(tablePath)) {
             backedCatalog.alterTable(tablePath, newTable, ignoreIfNotExists);
             return;
         }

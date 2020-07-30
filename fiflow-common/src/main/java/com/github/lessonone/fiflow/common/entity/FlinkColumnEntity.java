@@ -5,18 +5,15 @@ package com.github.lessonone.fiflow.common.entity;
  */
 public class FlinkColumnEntity {
     public static final String TableName = "fi_flink_table_column";
-    public static final String SqlSelectByTableId = "SELECT id, table_id, name ,data_type, expr FROM "+TableName+" WHERE table_id = ?";
-    public static final String SqlDeleteByTableId = "DELETE FROM "+TableName+" WHERE table_id = ?";
+    public static final String SqlSelectByTableId = "SELECT id, table_id, name ,data_type, expr FROM " + TableName + " WHERE table_id = ?";
+    public static final String SqlDeleteByTableId = "DELETE FROM " + TableName + " WHERE table_id = ?";
 
-    // auto primary key
     private Long id;
     // FlinkTableEntity id
     private Long tableId;
-    // column name
     private String name;
     // flink column data type
     private String dataType;
-    // expr
     private String expr;
 
     public Long getId() {

@@ -14,7 +14,6 @@
         <module>fiflow-io</module>
         <module>fiflow-core</module>
         <module>fiflow-web</module>
-        <module>fiflow-ui</module>
     </modules>
 
 
@@ -61,7 +60,7 @@
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.47</version>
+                <version>8.0.21</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

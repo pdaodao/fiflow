@@ -3,7 +3,6 @@ package com.github.lessonone.fiflow.common.learn;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamUtils;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
@@ -15,14 +14,14 @@ import org.apache.flink.util.Collector;
  */
 public class WindowWordCount {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
         DataStream<Tuple2<String, Integer>> dataInputStream = env.socketTextStream("localhost", 9999)
                 .flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
                     @Override
                     public void flatMap(String value, Collector<Tuple2<String, Integer>> out) throws Exception {
-                        for(String t : value.split(" ")){
+                        for (String t : value.split(" ")) {
                             out.collect(new Tuple2<String, Integer>(t, 1));
                         }
                     }

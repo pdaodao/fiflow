@@ -1,8 +1,8 @@
 package com.github.lessonone.fiflow.common.tmp;
 
 import com.github.lessonone.fiflow.common.base.DbInfo;
-import com.github.lessonone.fiflow.common.meta.JdbcBaseMetaReader;
 import com.github.lessonone.fiflow.common.base.TableInfo;
+import com.github.lessonone.fiflow.common.meta.JdbcBaseMetaReader;
 
 public class MetaTest {
     public static void main(String[] args) {

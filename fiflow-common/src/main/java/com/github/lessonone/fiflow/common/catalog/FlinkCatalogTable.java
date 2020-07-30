@@ -20,12 +20,12 @@ public class FlinkCatalogTable extends CatalogTableImpl {
         this.id = id;
     }
 
+    public Long getDatabaseId() {
+        return databaseId;
+    }
+
     public FlinkCatalogTable setDatabaseId(Long databaseId) {
         this.databaseId = databaseId;
         return this;
-    }
-
-    public Long getDatabaseId() {
-        return databaseId;
     }
 }

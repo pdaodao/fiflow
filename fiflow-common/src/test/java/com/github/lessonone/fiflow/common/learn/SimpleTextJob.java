@@ -17,7 +17,7 @@ public class SimpleTextJob {
 
         env.setParallelism(1);
 
-        DataStreamSource<String> input =  env.readTextFile("student.csv");
+        DataStreamSource<String> input = env.readTextFile("student.csv");
 
         DataStream<Row> student = input.map(new MapFunction<String, Row>() {
             @Override
@@ -29,17 +29,15 @@ public class SimpleTextJob {
 
         Iterator<Row> it = DataStreamUtils.collect(student);
         System.out.println("=========== it start =========== ");
-        while(it.hasNext()){
+        while (it.hasNext()) {
             System.out.println(it.next().toString());
         }
         System.out.println("=========== it end =========== ");
 
 
-
 //        student.writeAsText(rootPath+"haha.csv");
 
 //        JobClient jobClient = env.executeAsync("simple text job");
-
 
 
     }

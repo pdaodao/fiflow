@@ -8,7 +8,10 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.table.api.TableColumn;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.api.constraints.UniqueConstraint;
-import org.apache.flink.table.catalog.*;
+import org.apache.flink.table.catalog.CatalogBaseTable;
+import org.apache.flink.table.catalog.CatalogDatabase;
+import org.apache.flink.table.catalog.CatalogTable;
+import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.exceptions.*;
 import org.apache.flink.table.types.DataType;
 import org.apache.flink.table.types.logical.utils.LogicalTypeParser;
@@ -19,8 +22,12 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
+
 import static org.apache.flink.util.Preconditions.checkArgument;
 
 public class MetaDbDao {
@@ -41,7 +48,7 @@ public class MetaDbDao {
         DbUtils.closeDatasource(dbInfo);
     }
 
-    public List<String> listCatalogs( ) {
+    public List<String> listCatalogs() {
         String sql = "SELECT distinct catalog FROM fi_flink_database";
         return jdbcTemplate.queryForList(sql, String.class);
     }
@@ -54,23 +61,23 @@ public class MetaDbDao {
     public FlinkCatalogDatabase getDatabase(String catalog, String databaseName) throws DatabaseNotExistException, CatalogException {
         String sql = "SELECT catalog , name , properties , comment from fi_flink_database where catalog = ? and name = ?";
         List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, catalog, databaseName);
-        if(CollectionUtils.isEmpty(rows)) throw new DatabaseNotExistException(catalog, databaseName,  null);
+        if (CollectionUtils.isEmpty(rows)) throw new DatabaseNotExistException(catalog, databaseName, null);
         Map<String, Object> row = rows.get(0);
 
         Long id = DbUtils.getValueAsLong(row, "id");
         Map<String, String> properties = DbUtils.getValueAsMapString(row, "properties");
 
-        String comment =  DbUtils.getValueAsString(row, "comment");
+        String comment = DbUtils.getValueAsString(row, "comment");
         return new FlinkCatalogDatabase(id, properties, comment).setCatalog(catalog);
     }
 
     public void createDatabase(final String catalog, final String name, CatalogDatabase database, boolean ignoreIfExists) throws DatabaseAlreadyExistException, CatalogException {
-        try{
+        try {
             CatalogDatabase old = getDatabase(catalog, name);
-            if(!ignoreIfExists){
+            if (!ignoreIfExists) {
                 throw new DatabaseAlreadyExistException(catalog, name);
             }
-        }catch (DatabaseNotExistException e){
+        } catch (DatabaseNotExistException e) {
             Map<String, Object> row = new HashMap<>();
             row.put("catalog", catalog);
             row.put("name", name);
@@ -87,11 +94,11 @@ public class MetaDbDao {
         Long count = jdbcTemplate.queryForObject(countTableSql, Long.class, db.getId());
         final String deleteDbSql = "delete from fi_flink_database where id = ?";
 
-        if(count == 0){
+        if (count == 0) {
             jdbcTemplate.update(deleteDbSql, db.getId());
             return;
         }
-        if(!cascade) {
+        if (!cascade) {
             throw new DatabaseNotEmptyException(catalog, databaseName);
         }
         final String deleteColumnSql = "delete from fi_flink_table_column where table_id in (\n" +
@@ -127,10 +134,10 @@ public class MetaDbDao {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName), "databaseName cannot be null or empty");
         String sql = "SELECT id, catalog, name from fi_flink_database where catalog = ? and name = ?";
         List<Map<String, Object>> ret = jdbcTemplate.queryForList(sql, catalog, databaseName);
-        if(CollectionUtils.isEmpty(ret)){
+        if (CollectionUtils.isEmpty(ret)) {
             final String insert = "INSERT INTO fi_flink_database(catalog, name) VALUES (?, ?)";
             return DbUtils.insertReturnAutoId(jdbcTemplate, insert, catalog, databaseName);
-        }else{
+        } else {
             return (Long) ret.get(0).get("id");
         }
     }
@@ -144,7 +151,7 @@ public class MetaDbDao {
         });
     }
 
-    public boolean createTable(String catalog, ObjectPath tablePath, CatalogBaseTable table, boolean ignoreIfExists){
+    public boolean createTable(String catalog, ObjectPath tablePath, CatalogBaseTable table, boolean ignoreIfExists) {
         Long dbId = getOrCreateDatabase(catalog, tablePath.getDatabaseName());
         String tableName = tablePath.getObjectName();
         String realTableName = table.getOptions().get("connector.table");
@@ -155,21 +162,20 @@ public class MetaDbDao {
         rowMap.put("properties", table.getOptions());
         rowMap.put("comment", table.getComment());
 
-        if(table instanceof CatalogTable){
+        if (table instanceof CatalogTable) {
             CatalogTable catalogTable = (CatalogTable) table;
             rowMap.put("partitioned", catalogTable.isPartitioned());
             rowMap.put("partition_keys", catalogTable.getPartitionKeys());
         }
 
-        if(table.getSchema().getPrimaryKey().isPresent()){
+        if (table.getSchema().getPrimaryKey().isPresent()) {
             UniqueConstraint pk = table.getSchema().getPrimaryKey().get();
             rowMap.put("primary_key_name", pk.getName());
             rowMap.put("primary_key_columns", pk.getColumns());
             rowMap.put("primary_key_type", pk.getType().toString());
         }
 
-        if(CollectionUtils.isNotEmpty(table.getSchema().getWatermarkSpecs())){
-
+        if (CollectionUtils.isNotEmpty(table.getSchema().getWatermarkSpecs())) {
 
 
         }
@@ -177,11 +183,11 @@ public class MetaDbDao {
         // water todo
         table.getSchema();
 
-        transactionWrap(()-> {
-            Long tableId = DbUtils.insertReturnAutoId(jdbcTemplate,"fi_flink_table", rowMap);
+        transactionWrap(() -> {
+            Long tableId = DbUtils.insertReturnAutoId(jdbcTemplate, "fi_flink_table", rowMap);
             String sql = "INSERT INTO fi_flink_table_column(table_id, name, data_type, expr) values (?, ?,?, ?)";
             List<Object[]> values = new ArrayList<>();
-            for(TableColumn column:table.getSchema().getTableColumns()){
+            for (TableColumn column : table.getSchema().getTableColumns()) {
 //                String dataType = column.getType().getLogicalType().asSerializableString();
                 String dataType = column.getType().toString();
                 values.add(new Object[]{tableId, column.getName(), dataType, column.getExpr().orElse(null)});
@@ -193,9 +199,7 @@ public class MetaDbDao {
     }
 
 
-
-
-    public boolean tableExists(String catalog, ObjectPath tablePath){
+    public boolean tableExists(String catalog, ObjectPath tablePath) {
         String sql = "SELECT count(1) FROM fi_flink_database a " +
                 "INNER JOIN fi_flink_table b ON b.database_id = a.id " +
                 "WHERE a.catalog = ? AND a.name = ? AND b.name = ?";
@@ -212,7 +216,7 @@ public class MetaDbDao {
         String columnSql = "SELECT name, data_type, expr FROM fi_flink_table_column where table_id = ?";
 
         List<Map<String, Object>> tables = jdbcTemplate.queryForList(tableSql, catalog, tablePath.getDatabaseName(), tablePath.getObjectName());
-        if(CollectionUtils.isEmpty(tables)){
+        if (CollectionUtils.isEmpty(tables)) {
             throw new TableNotExistException(catalog, tablePath);
         }
         Map<String, Object> tableInfo = tables.get(0);
@@ -223,14 +227,14 @@ public class MetaDbDao {
         List<Map<String, Object>> columnMaps = jdbcTemplate.queryForList(columnSql, tableId);
 
         TableSchema.Builder schemaBuilder = TableSchema.builder();
-        for(Map<String, Object> row : columnMaps){
+        for (Map<String, Object> row : columnMaps) {
             String name = DbUtils.getValueAsString(row, "name");
             String type = DbUtils.getValueAsString(row, "data_type");
             String expr = DbUtils.getValueAsString(row, "expr");
             DataType dataType = TypeConversions.fromLogicalToDataType(LogicalTypeParser.parse(type));
-            if(expr == null){
+            if (expr == null) {
                 schemaBuilder.add(TableColumn.of(name, dataType));
-            }else {
+            } else {
                 schemaBuilder.add(TableColumn.of(name, dataType, expr));
             }
         }

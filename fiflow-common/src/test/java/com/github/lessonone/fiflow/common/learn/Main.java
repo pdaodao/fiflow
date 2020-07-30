@@ -1,7 +1,7 @@
 package com.github.lessonone.fiflow.common.learn;
 
-import com.github.lessonone.fiflow.common.base.DbInfo;
 import com.github.lessonone.fiflow.common.FlinkInDbCatalog;
+import com.github.lessonone.fiflow.common.base.DbInfo;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.table.api.EnvironmentSettings;
 import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
@@ -9,11 +9,12 @@ import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 public class Main {
 
     /**
-     *  GenericInMemoryCatalog inMemoryCatalog = new GenericInMemoryCatalog("haha");
+     * GenericInMemoryCatalog inMemoryCatalog = new GenericInMemoryCatalog("haha");
+     *
      * @param args
      * @throws Exception
      */
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         EnvironmentSettings bsSettings = EnvironmentSettings.newInstance()
                 .useBlinkPlanner()

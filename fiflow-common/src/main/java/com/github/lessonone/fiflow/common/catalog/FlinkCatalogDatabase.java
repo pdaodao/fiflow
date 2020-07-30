@@ -2,6 +2,7 @@ package com.github.lessonone.fiflow.common.catalog;
 
 import org.apache.flink.table.catalog.CatalogDatabase;
 import org.apache.flink.table.catalog.CatalogDatabaseImpl;
+
 import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
@@ -19,13 +20,13 @@ public class FlinkCatalogDatabase extends CatalogDatabaseImpl {
         this.id = id;
     }
 
+    public String getCatalog() {
+        return catalog;
+    }
+
     public FlinkCatalogDatabase setCatalog(String catalog) {
         this.catalog = catalog;
         return this;
-    }
-
-    public String getCatalog() {
-        return catalog;
     }
 
     public Long getId() {

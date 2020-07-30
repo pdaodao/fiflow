@@ -1,4 +1,4 @@
 package com.github.lessonone.fiflow.common;
 
-public class GenericMetaCatalogTest{
+public class GenericMetaCatalogTest {
 }

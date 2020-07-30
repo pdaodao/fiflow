@@ -47,17 +47,17 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public CatalogDatabase getDatabase(String databaseName) throws DatabaseNotExistException, CatalogException {
-       return metaDbDao.getDatabase(getName(), databaseName);
+        return metaDbDao.getDatabase(getName(), databaseName);
     }
 
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
-        try{
+        try {
             getDatabase(databaseName);
-        }catch (DatabaseNotExistException e){
+        } catch (DatabaseNotExistException e) {
             return false;
         }
-        return  true;
+        return true;
     }
 
     @Override
