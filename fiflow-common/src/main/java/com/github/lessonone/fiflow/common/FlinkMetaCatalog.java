@@ -155,7 +155,10 @@ public class FlinkMetaCatalog extends AbstractCatalog {
 
     @Override
     public void renameTable(ObjectPath tablePath, String newTableName, boolean ignoreIfNotExists) throws TableNotExistException, TableAlreadyExistException, CatalogException {
-
+        if(backedCatalog.tableExists(tablePath)){
+            backedCatalog.renameTable(tablePath, newTableName, ignoreIfNotExists);
+        }
+        throw new UnsupportedOperationException();
     }
 
     @Override

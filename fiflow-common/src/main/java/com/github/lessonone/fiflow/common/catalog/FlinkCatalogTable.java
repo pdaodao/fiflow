@@ -9,6 +9,7 @@ import java.util.Map;
 public class FlinkCatalogTable extends CatalogTableImpl {
     private final Long id;
     private Long databaseId;
+    private Long connectorId;
 
     public FlinkCatalogTable(Long id, TableSchema tableSchema, Map<String, String> properties, String comment) {
         super(tableSchema, properties, comment);
@@ -20,6 +21,10 @@ public class FlinkCatalogTable extends CatalogTableImpl {
         this.id = id;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Long getDatabaseId() {
         return databaseId;
     }
@@ -27,5 +32,14 @@ public class FlinkCatalogTable extends CatalogTableImpl {
     public FlinkCatalogTable setDatabaseId(Long databaseId) {
         this.databaseId = databaseId;
         return this;
+    }
+
+    public FlinkCatalogTable setConnectorId(Long connectorId) {
+        this.connectorId = connectorId;
+        return this;
+    }
+
+    public Long getConnectorId() {
+        return connectorId;
     }
 }

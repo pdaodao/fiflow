@@ -97,7 +97,7 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public void dropTable(ObjectPath tablePath, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-
+        metaDbDao.dropTable(getName(), tablePath, ignoreIfNotExists);
     }
 
     @Override

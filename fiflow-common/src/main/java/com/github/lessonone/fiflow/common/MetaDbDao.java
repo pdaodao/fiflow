@@ -113,6 +113,14 @@ public class MetaDbDao {
         });
     }
 
+    public void dropTable(String catalog, ObjectPath tablePath, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException{
+        if(!tableExists(catalog, tablePath)){
+            if(ignoreIfNotExists) return;
+            throw new TableNotExistException(catalog, tablePath);
+        }
+        // todo
+    }
+
 
     public void alterDatabase(final String catalog, final String databaseName, CatalogDatabase newDatabase, boolean ignoreIfNotExists) throws DatabaseNotExistException, CatalogException {
         FlinkCatalogDatabase db = getDatabase(catalog, databaseName);
