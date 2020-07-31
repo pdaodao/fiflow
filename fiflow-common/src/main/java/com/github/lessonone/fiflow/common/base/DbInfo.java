@@ -47,15 +47,15 @@ public class DbInfo {
         return this;
     }
 
-    public DbInfo addProperty(String key, String value){
-        if(this.properties == null)
+    public DbInfo addProperty(String key, String value) {
+        if (this.properties == null)
             this.properties = new LinkedHashMap<>();
         this.properties.put(key, value);
         return this;
     }
 
     public Map<String, String> getProperties() {
-        if(properties == null) properties = new HashMap<>();
+        if (properties == null) properties = new HashMap<>();
         return properties;
     }
 }

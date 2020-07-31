@@ -66,7 +66,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
         if (backedCatalog.databaseExists(databaseName)) {
             return backedCatalog.getDatabase(databaseName);
         }
-        if(!databases.containsKey(databaseName))
+        if (!databases.containsKey(databaseName))
             throw new DatabaseNotExistException(getName(), databaseName);
         final DbInfo dbInfo = databases.get(databaseName);
 
@@ -78,9 +78,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName));
         if (this.databases.containsKey(databaseName))
             return true;
-        if (backedCatalog.databaseExists(databaseName))
-            return true;
-        return false;
+        return backedCatalog.databaseExists(databaseName);
     }
 
     @Override
@@ -142,10 +140,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
         }
         TableInfo tableInfo = dispatchMetaReader.getMetaReader(databases.get(tablePath.getDatabaseName()))
                 .getTable(tablePath.getObjectName());
-        if (tableInfo != null && CollectionUtils.isNotEmpty(tableInfo.getColumns())) {
-            return true;
-        }
-        return false;
+        return tableInfo != null && CollectionUtils.isNotEmpty(tableInfo.getColumns());
     }
 
     @Override
@@ -158,7 +153,7 @@ public class FlinkMetaCatalog extends AbstractCatalog {
 
     @Override
     public void renameTable(ObjectPath tablePath, String newTableName, boolean ignoreIfNotExists) throws TableNotExistException, TableAlreadyExistException, CatalogException {
-        if(backedCatalog.tableExists(tablePath)){
+        if (backedCatalog.tableExists(tablePath)) {
             backedCatalog.renameTable(tablePath, newTableName, ignoreIfNotExists);
         }
         throw new UnsupportedOperationException();

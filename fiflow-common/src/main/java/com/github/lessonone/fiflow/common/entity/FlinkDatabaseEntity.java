@@ -11,14 +11,14 @@ import java.util.Map;
  * fi_flink_database
  */
 @Data
-public class FlinkDatabaseEntity extends BaseEntity{
+public class FlinkDatabaseEntity extends BaseEntity {
     private String catalog;
     private String name;
     private Map<String, String> properties;
     private String comment;
 
     public CatalogDatabase toCatalogDatabase() {
-        if(properties == null) properties = new HashMap<>();
+        if (properties == null) properties = new HashMap<>();
         CatalogDatabaseImpl db = new CatalogDatabaseImpl(properties, comment);
         return db;
     }

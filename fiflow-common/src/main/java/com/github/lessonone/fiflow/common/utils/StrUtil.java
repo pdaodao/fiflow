@@ -5,6 +5,7 @@ public class StrUtil {
 
     /**
      * to underline  HelloWorld -> hello_world
+     *
      * @param str
      * @return
      */
@@ -15,6 +16,7 @@ public class StrUtil {
 
     /**
      * 将驼峰式命名的字符串转换为使用符号连接方式
+     *
      * @param str
      * @param symbol
      * @return
@@ -59,6 +61,7 @@ public class StrUtil {
 
     /**
      * to camel case
+     *
      * @param name
      * @return
      */

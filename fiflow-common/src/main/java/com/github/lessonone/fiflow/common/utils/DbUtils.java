@@ -6,9 +6,12 @@ import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessin
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+
 import javax.sql.DataSource;
-import java.sql.*;
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DbUtils {
@@ -47,7 +50,7 @@ public class DbUtils {
         return jdbcTemplate;
     }
 
-    public static JdbcTemplate createJdbcTemplate(DataSource ds){
+    public static JdbcTemplate createJdbcTemplate(DataSource ds) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);
         return jdbcTemplate;
     }

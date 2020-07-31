@@ -1,7 +1,6 @@
 package com.github.lessonone.fiflow.common.entity;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,7 @@ import java.util.Map;
  * fi_flink_table
  */
 @Data
-public class FlinkTableEntity extends BaseEntity{
+public class FlinkTableEntity extends BaseEntity {
     private Long databaseId;
     private Long connectorId;
     // flink table name (ddl: create table $name)

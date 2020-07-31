@@ -8,7 +8,7 @@ import java.util.Map;
  * fi_flink_connector
  */
 @Data
-public class FlinkConnector extends BaseEntity{
+public class FlinkConnector extends BaseEntity {
     private Long typeId;
     private String typeName;
     private Map<String, String> properties;

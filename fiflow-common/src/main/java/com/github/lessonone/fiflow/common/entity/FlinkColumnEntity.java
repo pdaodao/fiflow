@@ -6,7 +6,7 @@ import lombok.Data;
  * fi_flink_table_column
  */
 @Data
-public class FlinkColumnEntity extends BaseEntity{
+public class FlinkColumnEntity extends BaseEntity {
     private Long tableId;
     private String name;
     // flink column data type
