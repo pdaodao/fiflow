@@ -1,5 +1,6 @@
 package com.github.lessonone.fiflow.common.base;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -54,6 +55,7 @@ public class DbInfo {
     }
 
     public Map<String, String> getProperties() {
+        if(properties == null) properties = new HashMap<>();
         return properties;
     }
 }

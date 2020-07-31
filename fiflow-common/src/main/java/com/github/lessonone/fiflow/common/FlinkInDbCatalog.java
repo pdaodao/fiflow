@@ -1,14 +1,24 @@
 package com.github.lessonone.fiflow.common;
 
 import com.github.lessonone.fiflow.common.base.DbInfo;
+import com.github.lessonone.fiflow.common.entity.FlinkColumnEntity;
+import com.github.lessonone.fiflow.common.entity.FlinkDatabaseEntity;
+import com.github.lessonone.fiflow.common.entity.FlinkTableEntity;
+import com.github.lessonone.fiflow.common.utils.DbUtils;
+import org.apache.flink.table.api.TableColumn;
+import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.*;
 import org.apache.flink.table.catalog.exceptions.*;
 import org.apache.flink.table.catalog.stats.CatalogColumnStatistics;
 import org.apache.flink.table.catalog.stats.CatalogTableStatistics;
 import org.apache.flink.table.expressions.Expression;
+import org.apache.flink.table.types.DataType;
+import org.apache.flink.table.types.logical.utils.LogicalTypeParser;
+import org.apache.flink.table.types.utils.TypeConversions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 把数据库 数据表 字段信息 保存在 mysql 数据库中
@@ -16,14 +26,15 @@ import java.util.List;
 public class FlinkInDbCatalog extends AbstractCatalog {
     public static final String DEFAULT_DB = "default";
     private MetaDbDao metaDbDao;
-
+    private final DbInfo dbInfo;
 
     // 参考
     private GenericInMemoryCatalog inMemoryCatalog;
 
     public FlinkInDbCatalog(String name, String defaultDatabase, DbInfo dbInfo) {
         super(name, defaultDatabase);
-        this.metaDbDao = new MetaDbDao(dbInfo);
+        this.dbInfo = dbInfo;
+        this.metaDbDao = new MetaDbDao(DbUtils.createDatasource(dbInfo));
     }
 
     public FlinkInDbCatalog(String name, DbInfo dbInfo) {
@@ -32,12 +43,10 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public void open() throws CatalogException {
-        metaDbDao.open();
     }
 
     @Override
     public void close() throws CatalogException {
-        metaDbDao.close();
     }
 
     @Override
@@ -47,17 +56,17 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public CatalogDatabase getDatabase(String databaseName) throws DatabaseNotExistException, CatalogException {
-        return metaDbDao.getDatabase(getName(), databaseName);
+        Optional<FlinkDatabaseEntity> db = metaDbDao.getDatabase(getName(), databaseName);
+        if(!db.isPresent())
+            throw new DatabaseNotExistException(getName(), databaseName);
+        return db.get().toCatalogDatabase();
     }
 
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
-        try {
-            getDatabase(databaseName);
-        } catch (DatabaseNotExistException e) {
-            return false;
-        }
-        return true;
+        Optional<FlinkDatabaseEntity> db = metaDbDao.getDatabase(getName(), databaseName);
+        if(db.isPresent()) return true;
+        return false;
     }
 
     @Override
@@ -87,12 +96,37 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
-        return metaDbDao.getTable(getName(), tablePath);
+        final Optional<FlinkTableEntity> tableEntity = metaDbDao.getTable(getName(), tablePath);
+        if(!tableEntity.isPresent())
+            throw new TableNotExistException(getName(), tablePath);
+
+        final FlinkTableEntity tableInfo = tableEntity.get();
+
+        List<FlinkColumnEntity> columns = metaDbDao.getColumns(tableInfo.getId());
+
+        TableSchema.Builder schemaBuilder = TableSchema.builder();
+        if(columns != null) {
+            for(FlinkColumnEntity column: columns) {
+                DataType dataType = TypeConversions.fromLogicalToDataType(LogicalTypeParser.parse(column.getDataType()));
+                if (column.getExpr() == null) {
+                    schemaBuilder.add(TableColumn.of(column.getName(), dataType));
+                } else {
+                    schemaBuilder.add(TableColumn.of(column.getName(), dataType, column.getExpr()));
+                }
+            }
+        }
+
+        return new CatalogTableImpl(schemaBuilder.build(),
+                tableInfo.getPartitionKeys(),
+                tableInfo.getProperties(),
+                tableInfo.getComment());
     }
 
     @Override
     public boolean tableExists(ObjectPath tablePath) throws CatalogException {
-        return metaDbDao.tableExists(getName(), tablePath);
+        Optional<FlinkTableEntity> table = metaDbDao.getTable(getName(), tablePath);
+        if(table.isPresent()) return true;
+        return false;
     }
 
     @Override

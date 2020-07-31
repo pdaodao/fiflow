@@ -2,7 +2,6 @@ package com.github.lessonone.fiflow.common;
 
 import com.github.lessonone.fiflow.common.base.DbInfo;
 import com.github.lessonone.fiflow.common.base.TableInfo;
-import com.github.lessonone.fiflow.common.catalog.FlinkCatalogDatabase;
 import com.github.lessonone.fiflow.common.exception.AutoMetaNotSupportException;
 import com.github.lessonone.fiflow.common.meta.DispatchMetaReader;
 import org.apache.commons.collections.CollectionUtils;
@@ -67,7 +66,11 @@ public class FlinkMetaCatalog extends AbstractCatalog {
         if (backedCatalog.databaseExists(databaseName)) {
             return backedCatalog.getDatabase(databaseName);
         }
-        return new FlinkCatalogDatabase(null, new HashMap<>(), null).setCatalog(getName());
+        if(!databases.containsKey(databaseName))
+            throw new DatabaseNotExistException(getName(), databaseName);
+        final DbInfo dbInfo = databases.get(databaseName);
+
+        return new CatalogDatabaseImpl(dbInfo.getProperties(), null);
     }
 
     @Override

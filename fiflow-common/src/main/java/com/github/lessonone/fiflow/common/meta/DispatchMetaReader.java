@@ -3,11 +3,11 @@ package com.github.lessonone.fiflow.common.meta;
 import com.github.lessonone.fiflow.common.MetaReader;
 import com.github.lessonone.fiflow.common.base.DbInfo;
 import com.github.lessonone.fiflow.common.base.TableInfo;
-import com.github.lessonone.fiflow.common.catalog.FlinkCatalogTable;
 import com.github.lessonone.fiflow.common.exception.AutoMetaNotSupportException;
 import org.apache.flink.table.api.DataTypes;
 import org.apache.flink.table.api.TableSchema;
 import org.apache.flink.table.catalog.CatalogBaseTable;
+import org.apache.flink.table.catalog.CatalogTableImpl;
 import org.apache.flink.table.catalog.ObjectPath;
 import org.apache.flink.table.catalog.exceptions.CatalogException;
 import org.apache.flink.table.catalog.exceptions.TableNotExistException;
@@ -166,7 +166,8 @@ public class DispatchMetaReader {
         properties.put("connector.username", dbInfo.getUsername());
         properties.put("connector.password", dbInfo.getPassword());
 
-        return new FlinkCatalogTable(null, tableSchema, properties, null);
+
+        return new CatalogTableImpl(tableSchema, properties, null);
     }
 
 
