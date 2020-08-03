@@ -122,8 +122,7 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public boolean tableExists(ObjectPath tablePath) throws CatalogException {
-        Optional<FlinkTableEntity> table = metaDbDao.getTable(getName(), tablePath.getDatabaseName(), tablePath.getObjectName());
-        return table.isPresent();
+        return metaDbDao.tableExists(getName(), tablePath.getDatabaseName(), tablePath.getObjectName());
     }
 
     @Override
@@ -133,17 +132,23 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public void renameTable(ObjectPath tablePath, String newTableName, boolean ignoreIfNotExists) throws TableNotExistException, TableAlreadyExistException, CatalogException {
-
+        if (!tableExists(tablePath)) {
+            if (!ignoreIfNotExists)
+                throw new TableNotExistException(getName(), tablePath);
+        }
+        metaDbDao.renameTable(getName(), tablePath, newTableName);
     }
 
     @Override
     public void createTable(ObjectPath tablePath, CatalogBaseTable table, boolean ignoreIfExists) throws TableAlreadyExistException, DatabaseNotExistException, CatalogException {
+
+
         metaDbDao.createTable(getName(), tablePath, table, ignoreIfExists);
     }
 
     @Override
     public void alterTable(ObjectPath tablePath, CatalogBaseTable newTable, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-
+        metaDbDao.alterTable(getName(), tablePath, newTable, ignoreIfNotExists);
     }
 
     @Override

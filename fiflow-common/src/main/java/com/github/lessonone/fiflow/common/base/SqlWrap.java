@@ -1,22 +1,23 @@
 package com.github.lessonone.fiflow.common.base;
 
+import com.github.lessonone.fiflow.common.utils.DaoUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlSelect {
+public class SqlWrap {
     private final String sql;
     private final Object[] args;
 
-    private SqlSelect(String sql, Object[] args) {
+    private SqlWrap(String sql, Object[] args) {
         this.sql = sql;
         this.args = args;
     }
 
-    public static SqlSelectBuilder builder() {
-        return new SqlSelectBuilder();
+    public static SqlWrapBuilder builder() {
+        return new SqlWrapBuilder();
     }
 
     public String getSql() {
@@ -27,43 +28,43 @@ public class SqlSelect {
         return args;
     }
 
-    public static class SqlSelectBuilder {
+    public static class SqlWrapBuilder {
         private final StringBuilder sql = new StringBuilder();
         private final List<Object> params = new ArrayList<>();
         private final StringBuilder where = new StringBuilder();
 
-        public SqlSelect build() {
+        public SqlWrap build() {
             if (where.length() > 0) {
                 sql.append(" WHERE ").append(where.toString());
             }
-            return new SqlSelect(sql.toString(), params.stream().toArray());
+            return new SqlWrap(sql.toString(), params.stream().toArray());
         }
 
-        public SqlSelectBuilder count(Class<?> clazz) {
+        public SqlWrapBuilder count(Class<?> clazz) {
             sql.append("SELECT count(1) FROM ").append(DaoUtils.getTableName(clazz));
             return this;
         }
 
-        public SqlSelectBuilder select(String... fields) {
+        public SqlWrapBuilder select(String... fields) {
             if (fields == null) return this;
             sql.append("SELECT ");
             sql.append(StringUtils.join(fields, ','));
             return this;
         }
 
-        public SqlSelectBuilder delete(Class<?> clazz) {
+        public SqlWrapBuilder delete(Class<?> clazz) {
             sql.append("DELETE FROM ").append(DaoUtils.getTableName(clazz));
             return this;
         }
 
-        public SqlSelectBuilder from(Class<?> clazz, @Nullable String tableAlias) {
+        public SqlWrapBuilder from(Class<?> clazz, @Nullable String tableAlias) {
             sql.append(" FROM ").append(DaoUtils.getTableName(clazz));
             if (tableAlias != null)
                 sql.append(" ").append(tableAlias);
             return this;
         }
 
-        public SqlSelectBuilder from(Class<?> clazz) {
+        public SqlWrapBuilder from(Class<?> clazz) {
             return from(clazz, null);
         }
 
@@ -82,7 +83,7 @@ public class SqlSelect {
             return new Join(this);
         }
 
-        private SqlSelectBuilder joinOn(String on) {
+        private SqlWrapBuilder joinOn(String on) {
             if (on == null) return this;
             sql.append(" ON ").append(on);
             return this;
@@ -92,7 +93,7 @@ public class SqlSelect {
             return and(field);
         }
 
-        public SqlSelectBuilder whereSql(String sqlFragment, Object... args) {
+        public SqlWrapBuilder whereSql(String sqlFragment, Object... args) {
             return and(sqlFragment).sqlArgs(args);
         }
 
@@ -111,11 +112,11 @@ public class SqlSelect {
     }
 
     public static class Where {
-        final SqlSelectBuilder sqlSelect;
+        final SqlWrapBuilder sqlSelect;
         final String field;
         final String logical;
 
-        public Where(SqlSelectBuilder sqlSelect, String field, String logical) {
+        public Where(SqlWrapBuilder sqlSelect, String field, String logical) {
             this.sqlSelect = sqlSelect;
             this.field = field;
             this.logical = logical;
@@ -127,13 +128,13 @@ public class SqlSelect {
             }
         }
 
-        public SqlSelectBuilder equal(Object value) {
+        public SqlWrapBuilder equal(Object value) {
             before();
             sqlSelect.where.append(field).append(" = ?");
             return addArgs(value);
         }
 
-        public SqlSelectBuilder in(SqlSelect inSelect) {
+        public SqlWrapBuilder in(SqlWrap inSelect) {
             before();
             sqlSelect.where.append(field).append(" IN ");
             sqlSelect.where.append("(")
@@ -142,13 +143,13 @@ public class SqlSelect {
             return addArgs(inSelect.getArgs());
         }
 
-        public SqlSelectBuilder sqlArgs(Object... args) {
+        public SqlWrapBuilder sqlArgs(Object... args) {
             before();
             sqlSelect.where.append(field);
             return addArgs(args);
         }
 
-        public SqlSelectBuilder addArgs(Object... args) {
+        public SqlWrapBuilder addArgs(Object... args) {
             if (args != null) {
                 for (Object arg : args) {
                     sqlSelect.params.add(arg);
@@ -158,7 +159,7 @@ public class SqlSelect {
         }
 
 
-        public SqlSelectBuilder equalIgnoreNull(Object value) {
+        public SqlWrapBuilder equalIgnoreNull(Object value) {
             if (value == null) return sqlSelect;
             before();
             sqlSelect.where.append(field).append(" = ?");
@@ -168,13 +169,13 @@ public class SqlSelect {
     }
 
     public static class Join {
-        final SqlSelectBuilder sqlSelect;
+        final SqlWrapBuilder sqlSelect;
 
-        public Join(SqlSelectBuilder sqlSelect) {
+        public Join(SqlWrapBuilder sqlSelect) {
             this.sqlSelect = sqlSelect;
         }
 
-        public SqlSelectBuilder on(String on) {
+        public SqlWrapBuilder on(String on) {
             return sqlSelect.joinOn(on);
         }
     }

@@ -2,7 +2,6 @@ package com.github.lessonone.fiflow.common.utils;
 
 import com.github.lessonone.fiflow.common.base.DbInfo;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.flink.shaded.jackson2.com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -10,45 +9,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DbUtils {
     private static final Map<String, HikariDataSource> sourceMap = new ConcurrentHashMap<>();
 
-    public static Map<String, String> getValueAsMapString(Map<String, Object> row, String key) {
-        if (row == null) return null;
-        Object v = row.get(key);
-        if (v == null) return new HashMap<>();
-        try {
-            return JSON.toPojo(v.toString(), Map.class);
-        } catch (JsonProcessingException e) {
-
-        }
-        return new HashMap<>();
-    }
-
-    public static String getValueAsString(Map<String, Object> row, String key) {
-        if (row == null) return null;
-        Object v = row.get(key);
-        if (v == null) return null;
-        return v.toString();
-    }
-
-    public static Long getValueAsLong(Map<String, Object> row, String key) {
-        if (row == null) return null;
-        Object v = row.get(key);
-        if (v == null) return 0l;
-        if (v instanceof Long || v instanceof Integer) return (Long) v;
-        return Long.parseLong(v.toString());
-    }
-
-    public static JdbcTemplate createJdbcTemplate(DbInfo dbInfo) {
-        DataSource dataSource = createDatasource(dbInfo);
-        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-        return jdbcTemplate;
-    }
 
     public static JdbcTemplate createJdbcTemplate(DataSource ds) {
         JdbcTemplate jdbcTemplate = new JdbcTemplate(ds);

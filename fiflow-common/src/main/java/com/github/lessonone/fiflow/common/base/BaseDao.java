@@ -1,6 +1,7 @@
 package com.github.lessonone.fiflow.common.base;
 
 import com.github.lessonone.fiflow.common.entity.BaseEntity;
+import com.github.lessonone.fiflow.common.utils.DaoUtils;
 import com.github.lessonone.fiflow.common.utils.DbUtils;
 import com.github.lessonone.fiflow.common.utils.JSON;
 import org.apache.commons.collections.CollectionUtils;
@@ -55,7 +56,7 @@ public class BaseDao {
         return val;
     }
 
-    public <T> List<T> queryForList(SqlSelect sqlSelect, Class<T> elementType) {
+    public <T> List<T> queryForList(SqlWrap sqlSelect, Class<T> elementType) {
         return queryForList(sqlSelect.getSql(), elementType, sqlSelect.getArgs());
     }
 
@@ -66,7 +67,7 @@ public class BaseDao {
         return jdbcTemplate.query(sql, new MyRowMapper<>(elementType), args);
     }
 
-    public <T> Optional<T> queryForOne(SqlSelect sqlSelect, Class<T> elementType) {
+    public <T> Optional<T> queryForOne(SqlWrap sqlSelect, Class<T> elementType) {
         return queryForOne(sqlSelect.getSql(), elementType, sqlSelect.getArgs());
     }
 
@@ -90,6 +91,11 @@ public class BaseDao {
         return insert(entity, true);
     }
 
+
+    public <T extends BaseEntity> int update(T entity) {
+        return update(entity, true);
+    }
+
     public <T extends BaseEntity> Long insert(T entity, boolean isSelective) {
         final String tableName = DaoUtils.getTableName(entity);
         Tuple2<Long, Map<String, Object>> t = DaoUtils.entityToMap(entity);
@@ -97,11 +103,8 @@ public class BaseDao {
         return insertInto(tableName, t.f1, isSelective);
     }
 
-    public <T extends BaseEntity> int update(T entity) {
-        return update(entity, true);
-    }
 
-    public int update(SqlSelect sqlSelect) {
+    public int update(SqlWrap sqlSelect) {
         return jdbcTemplate.update(sqlSelect.getSql(), sqlSelect.getArgs());
     }
 

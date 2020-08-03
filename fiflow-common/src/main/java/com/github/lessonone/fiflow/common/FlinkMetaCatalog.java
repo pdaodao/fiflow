@@ -25,15 +25,20 @@ public class FlinkMetaCatalog extends AbstractCatalog {
     private final Map<String, DbInfo> databases;
     private final DispatchMetaReader dispatchMetaReader;
 
-    public FlinkMetaCatalog(String name, String defaultDatabase) {
-        super(name, defaultDatabase);
-        this.backedCatalog = new GenericInMemoryCatalog(name, defaultDatabase);
-        this.databases = new LinkedHashMap<>();
-        this.dispatchMetaReader = new DispatchMetaReader();
-    }
-
     public FlinkMetaCatalog(String name) {
         this(name, DEFAULT_DB);
+    }
+
+    public FlinkMetaCatalog(String name, String defaultDatabase) {
+        this(name, defaultDatabase, new GenericInMemoryCatalog(name, defaultDatabase));
+    }
+
+    public FlinkMetaCatalog(String name, String defaultDatabase, Catalog backed) {
+        super(name, defaultDatabase);
+        checkArgument(backed != null, "backed catalog is null for FlinkMetaCatalog");
+        this.databases = new LinkedHashMap<>();
+        this.dispatchMetaReader = new DispatchMetaReader();
+        this.backedCatalog = backed;
     }
 
     public void addDbInfo(String flinkDatabaseName, DbInfo dbInfo) throws DatabaseAlreadyExistException {
