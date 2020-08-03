@@ -1,6 +1,7 @@
 package com.github.lessonone.fiflow.common;
 
 import com.github.lessonone.fiflow.common.base.BaseDao;
+import com.github.lessonone.fiflow.common.base.SqlSelect;
 import com.github.lessonone.fiflow.common.entity.FlinkColumnEntity;
 import com.github.lessonone.fiflow.common.entity.FlinkDatabaseEntity;
 import com.github.lessonone.fiflow.common.entity.FlinkTableEntity;
@@ -20,33 +21,37 @@ import java.util.Optional;
 import static org.apache.flink.util.Preconditions.checkArgument;
 
 public class MetaDbDao extends BaseDao {
-    public static final String TableFlinkDatabase = "fi_flink_database";
-    public static final String TableFlinkTable = "fi_flink_table";
-    public static final String TableFlinkColumn = "fi_flink_table_column";
-
-    public static final String TableFlinkConnector = "fi_flink_connector";
-    private static final String TableFlinkConnectorType = "fi_flink_connector_type";
 
 
     public MetaDbDao(DataSource ds) {
         super(ds);
     }
 
-
     public List<String> listCatalogs() {
-        String sql = "SELECT distinct catalog FROM " + TableFlinkDatabase;
+        SqlSelect sql = SqlSelect.builder()
+                .select("distinct catalog")
+                .from(FlinkDatabaseEntity.class)
+                .build();
+
         return queryForList(sql, String.class);
     }
 
     public List<String> listDatabases(String catalog) {
-        String sql = "SELECT name FROM " + TableFlinkDatabase + " where catalog = ?";
-        return queryForList(sql, String.class, catalog);
+        SqlSelect sql = SqlSelect.builder()
+                .select("name")
+                .from(FlinkDatabaseEntity.class)
+                .where("catalog").equal(catalog)
+                .build();
+        return queryForList(sql, String.class);
     }
 
     public Optional<FlinkDatabaseEntity> getDatabase(String catalog, String databaseName) {
-        String sql = "SELECT * from " + TableFlinkDatabase + " where catalog = ? and name = ?";
-        FlinkDatabaseEntity entity = null;
-        return queryForOne(sql, FlinkDatabaseEntity.class, catalog, databaseName);
+        SqlSelect sql = SqlSelect.builder()
+                .select("*")
+                .from(FlinkDatabaseEntity.class)
+                .whereSql("catalog = ? and name = ?", catalog, databaseName)
+                .build();
+        return queryForOne(sql, FlinkDatabaseEntity.class);
     }
 
     public void createDatabase(final String catalog, final String name, CatalogDatabase database, boolean ignoreIfExists) throws DatabaseAlreadyExistException, CatalogException {
@@ -56,13 +61,12 @@ public class MetaDbDao extends BaseDao {
                 throw new DatabaseAlreadyExistException(catalog, name);
             return;
         }
-
         FlinkDatabaseEntity db = new FlinkDatabaseEntity();
         db.setCatalog(catalog);
         db.setName(name);
         db.setProperties(database.getProperties());
         db.setComment(database.getComment());
-        insertSelective(TableFlinkDatabase, db);
+        insert(db);
     }
 
     public void dropDatabase(final String catalog, final String databaseName, boolean ignoreIfNotExists, boolean cascade) throws DatabaseNotExistException, DatabaseNotEmptyException, CatalogException {
@@ -73,36 +77,55 @@ public class MetaDbDao extends BaseDao {
             return;
         }
         final Long dbId = dbInfo.get().getId();
-        Optional<Long> count = queryForOne("SELECT count(1) FROM " + TableFlinkTable + " WHERE database_id = ?", Long.class, dbInfo.get().getId());
+
+        Optional<Long> count = queryForOne(
+                SqlSelect.builder().count(FlinkTableEntity.class)
+                        .where("database_id").equal(dbId)
+                        .build(), Long.class);
+
         if (count.isPresent() && count.get() > 0) {
             if (!cascade)
                 throw new DatabaseNotEmptyException(catalog, databaseName);
         }
         transactionWrap(() -> {
-            final String deleteColumnSql = "DELETE FROM " + TableFlinkColumn + " WHERE table_id in ("
-                    + "SELECT id FROM " + TableFlinkTable + " WHERE database_id = ?"
-                    + ")";
-            final String deleteTableSql = "delete from " + TableFlinkTable + " where database_id = ?";
-            final String deleteDb = "DELETE FROM " + TableFlinkDatabase + " WHERE id = ?";
-            update(deleteColumnSql, dbId);
-            update(deleteTableSql, dbId);
-            update(deleteDb, dbId);
+            final SqlSelect deleteColumnSql = SqlSelect.builder()
+                    .delete(FlinkColumnEntity.class)
+                    .where("table_id").in(SqlSelect
+                            .builder()
+                            .select("id").from(FlinkTableEntity.class)
+                            .where("database_id").equal(dbId)
+                            .build()
+                    ).build();
+            final SqlSelect deleteTableSql = SqlSelect.builder()
+                    .delete(FlinkTableEntity.class)
+                    .where("database_id").equal(dbId)
+                    .build();
+            final SqlSelect deleteDb = SqlSelect.builder().delete(FlinkDatabaseEntity.class).build();
+
+            update(deleteColumnSql);
+            update(deleteTableSql);
+            update(deleteDb);
             return true;
         });
     }
 
-    public void dropTable(String catalog, ObjectPath tablePath, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-        Optional<FlinkTableEntity> table = getTable(catalog, tablePath);
+
+    public void dropTable(String catalog, String databaseName, String tableName, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
+        Optional<FlinkTableEntity> table = getTable(catalog, databaseName, tableName);
         if (!table.isPresent()) {
             if (ignoreIfNotExists) return;
-            throw new TableNotExistException(catalog, tablePath);
+            throw new TableNotExistException(catalog, new ObjectPath(databaseName, tableName));
         }
         final Long tableId = table.get().getId();
         transactionWrap(() -> {
-            String deleteColumnSql = "DELETE FROM " + TableFlinkColumn + " WHERE table_id = ?";
-            String deleteTableSql = "DELETE FROM " + TableFlinkTable + " WHERE id = ?";
-            update(deleteColumnSql, tableId);
-            update(deleteTableSql, tableId);
+            SqlSelect deleteColumnSql = SqlSelect.builder()
+                    .delete(FlinkColumnEntity.class)
+                    .where("table_id").equal(tableId)
+                    .build();
+            SqlSelect deleteTableSql = SqlSelect.builder().delete(FlinkTableEntity.class)
+                    .where("id").equal(tableId).build();
+            update(deleteColumnSql);
+            update(deleteTableSql);
             return true;
         });
     }
@@ -115,14 +138,20 @@ public class MetaDbDao extends BaseDao {
         final FlinkDatabaseEntity dbInfo = db.get();
         dbInfo.setComment(newDatabase.getComment());
         dbInfo.setProperties(newDatabase.getProperties());
-        updateSelective(TableFlinkDatabase, dbInfo);
+
+        update(dbInfo);
     }
 
     public List<String> listTables(final String catalog, final String databaseName) {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName), "databaseName cannot be null or empty");
-        String sql = "SELECT a.name FROM " + TableFlinkTable + " a  INNER JOIN " + TableFlinkDatabase + " b "
-                + " ON a.database_id = b.id WHERE b.catalog = ? AND a.name = ?";
-        return queryForList(sql, String.class, catalog, databaseName);
+        SqlSelect sqlSelect = SqlSelect.builder()
+                .select("a.name").from(FlinkTableEntity.class, "a")
+                .innerJoin(FlinkDatabaseEntity.class, "b")
+                .on("a.database_id = b.id")
+                .where("b.catalog").equal(catalog)
+                .and("b.name").equal(databaseName)
+                .build();
+        return queryForList(sqlSelect, String.class);
     }
 
 
@@ -134,7 +163,7 @@ public class MetaDbDao extends BaseDao {
         FlinkDatabaseEntity db = new FlinkDatabaseEntity();
         db.setCatalog(catalog);
         db.setName(databaseName);
-        return insertSelective(TableFlinkDatabase, db);
+        return insert(db);
     }
 
     public boolean createTable(String catalog, ObjectPath tablePath, CatalogBaseTable table, boolean ignoreIfExists) {
@@ -162,7 +191,7 @@ public class MetaDbDao extends BaseDao {
         }
 
         transactionWrap(() -> {
-            final Long tableId = insertSelective(TableFlinkTable, tableInfo);
+            final Long tableId = insert(tableInfo);
             for (TableColumn column : table.getSchema().getTableColumns()) {
                 String dataType = column.getType().toString();
                 FlinkColumnEntity field = new FlinkColumnEntity();
@@ -170,7 +199,7 @@ public class MetaDbDao extends BaseDao {
                 field.setName(column.getName());
                 field.setDataType(dataType);
                 field.setExpr(column.getExpr().orElse(null));
-                insertSelective(TableFlinkColumn, field);
+                insert(field);
             }
             return true;
         });
@@ -178,14 +207,38 @@ public class MetaDbDao extends BaseDao {
         return true;
     }
 
-    public Optional<FlinkTableEntity> getTable(String catalog, ObjectPath tablePath) {
-        String sql = "SELECT a.* FROM " + TableFlinkTable + " a INNER JOIN " + TableFlinkDatabase + " b"
-                + " ON a.database_id = b.id WHERE b.catalog = ? AND b.name = ? and a.name = ?";
-        return queryForOne(sql, FlinkTableEntity.class, catalog, tablePath.getDatabaseName(), tablePath.getObjectName());
+    public Optional<FlinkTableEntity> getTable(final String catalog, final String databaseName, final String tableName) {
+//        SqlSelect sql = SqlSelect.builder()
+//                .select("a.*").from(FlinkTableEntity.class, "a")
+//                .innerJoin(FlinkDatabaseEntity.class, "b")
+//                .on("a.database_id = b.id")
+//                .where("b.catalog").equal(catalog)
+//                .and("b.name").equal(databaseName)
+//                .and("a.name").equal(tableName)
+//                .build();
+
+
+        SqlSelect sql = SqlSelect.builder()
+                .select("t.id, t.database_id, t.name, t.properties")
+                .from(FlinkDatabaseEntity.class, "d")
+                .innerJoin(FlinkTableEntity.class, "t")
+                .on("d.id = t.database_id")
+                .where("d.catalog").equal(catalog)
+                .and("d.name").equal(databaseName)
+                .and("t.name").equal(tableName)
+                .build();
+
+
+
+        System.out.println(sql.getSql());
+
+        return queryForOne(sql, FlinkTableEntity.class);
     }
 
     public List<FlinkColumnEntity> getColumns(Long tableId) {
-        String sql = "SELECT * FROM " + TableFlinkColumn + " WHERE table_id = ?";
-        return queryForList(sql, FlinkColumnEntity.class, tableId);
+        SqlSelect sql = SqlSelect.builder()
+                .select("*").from(FlinkColumnEntity.class).where("table_id").equal(tableId)
+                .build();
+        return queryForList(sql, FlinkColumnEntity.class);
     }
 }

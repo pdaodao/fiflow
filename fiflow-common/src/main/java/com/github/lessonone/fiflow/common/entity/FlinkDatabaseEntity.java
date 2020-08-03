@@ -1,5 +1,6 @@
 package com.github.lessonone.fiflow.common.entity;
 
+import com.github.lessonone.fiflow.common.base.Table;
 import lombok.Data;
 import org.apache.flink.table.catalog.CatalogDatabase;
 import org.apache.flink.table.catalog.CatalogDatabaseImpl;
@@ -7,10 +8,9 @@ import org.apache.flink.table.catalog.CatalogDatabaseImpl;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * fi_flink_database
- */
+
 @Data
+@Table("fi_flink_database")
 public class FlinkDatabaseEntity extends BaseEntity {
     private String catalog;
     private String name;

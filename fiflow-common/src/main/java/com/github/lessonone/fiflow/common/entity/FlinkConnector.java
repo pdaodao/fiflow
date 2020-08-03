@@ -1,13 +1,13 @@
 package com.github.lessonone.fiflow.common.entity;
 
+import com.github.lessonone.fiflow.common.base.Table;
 import lombok.Data;
 
 import java.util.Map;
 
-/**
- * fi_flink_connector
- */
+
 @Data
+@Table("fi_flink_connector")
 public class FlinkConnector extends BaseEntity {
     private Long typeId;
     private String typeName;

@@ -94,7 +94,7 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
-        final Optional<FlinkTableEntity> tableEntity = metaDbDao.getTable(getName(), tablePath);
+        final Optional<FlinkTableEntity> tableEntity = metaDbDao.getTable(getName(), tablePath.getDatabaseName(), tablePath.getObjectName());
         if (!tableEntity.isPresent())
             throw new TableNotExistException(getName(), tablePath);
 
@@ -122,13 +122,13 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
     @Override
     public boolean tableExists(ObjectPath tablePath) throws CatalogException {
-        Optional<FlinkTableEntity> table = metaDbDao.getTable(getName(), tablePath);
+        Optional<FlinkTableEntity> table = metaDbDao.getTable(getName(), tablePath.getDatabaseName(), tablePath.getObjectName());
         return table.isPresent();
     }
 
     @Override
     public void dropTable(ObjectPath tablePath, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-        metaDbDao.dropTable(getName(), tablePath, ignoreIfNotExists);
+        metaDbDao.dropTable(getName(), tablePath.getDatabaseName(), tablePath.getObjectName(), ignoreIfNotExists);
     }
 
     @Override

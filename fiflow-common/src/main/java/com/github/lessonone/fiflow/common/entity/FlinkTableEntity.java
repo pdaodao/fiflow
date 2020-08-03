@@ -1,14 +1,14 @@
 package com.github.lessonone.fiflow.common.entity;
 
+import com.github.lessonone.fiflow.common.base.Table;
 import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * fi_flink_table
- */
+
 @Data
+@Table("fi_flink_table")
 public class FlinkTableEntity extends BaseEntity {
     private Long databaseId;
     private Long connectorId;
@@ -23,6 +23,4 @@ public class FlinkTableEntity extends BaseEntity {
     private String primaryKeyType;
     private Boolean partitioned;
     private List<String> partitionKeys;
-
-
 }
