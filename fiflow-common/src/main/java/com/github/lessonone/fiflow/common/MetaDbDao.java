@@ -192,6 +192,8 @@ public class MetaDbDao extends BaseDao {
         tableInfo.setProperties(table.getOptions());
         tableInfo.setComment(table.getComment());
 
+        // todo connector id
+
 
         // todo
 //        tableInfo.setObjectName();

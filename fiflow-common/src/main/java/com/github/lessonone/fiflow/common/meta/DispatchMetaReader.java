@@ -160,11 +160,12 @@ public class DispatchMetaReader {
         TableSchema tableSchema = toTableSchema(tableInfo);
         Map<String, String> properties = new HashMap<>();
 
-        properties.put("connector.type", "jdbc");
-        properties.put("connector.url", dbInfo.getUrl());
-        properties.put("connector.table", tablePath.getObjectName());
-        properties.put("connector.username", dbInfo.getUsername());
-        properties.put("connector.password", dbInfo.getPassword());
+        properties.put("connector", "jdbc");
+        properties.put("url", dbInfo.getUrl());
+        properties.put("table-name", tablePath.getObjectName());
+        properties.put("username", dbInfo.getUsername());
+        properties.put("password", dbInfo.getPassword());
+        properties.put("driver", dbInfo.getDriverClassName());
 
 
         return new CatalogTableImpl(tableSchema, properties, null);

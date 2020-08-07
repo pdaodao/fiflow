@@ -11,5 +11,13 @@ import java.util.Map;
 public class FlinkConnector extends BaseEntity {
     private Long typeId;
     private String typeName;
-    private Map<String, String> properties;
+
+    // 连接属性
+    private Map<String, FlinkConnectorType.OptionDescriptor> options;
+    // 读属性
+    private Map<String, FlinkConnectorType.OptionDescriptor> readOptions;
+    // lookup 属性
+    private Map<String, FlinkConnectorType.OptionDescriptor> lookupOptions;
+    // 写属性
+    private Map<String, FlinkConnectorType.OptionDescriptor> writeOptions;
 }
