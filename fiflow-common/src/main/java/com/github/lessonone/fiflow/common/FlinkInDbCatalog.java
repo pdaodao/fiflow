@@ -100,8 +100,8 @@ public class FlinkInDbCatalog extends AbstractCatalog {
 
         final FlinkTableEntity tableInfo = tableEntity.get();
 
+        // 字段信息 表结构
         List<FlinkColumnEntity> columns = metaDbDao.getColumns(tableInfo.getId());
-
         TableSchema.Builder schemaBuilder = TableSchema.builder();
         if (columns != null) {
             for (FlinkColumnEntity column : columns) {

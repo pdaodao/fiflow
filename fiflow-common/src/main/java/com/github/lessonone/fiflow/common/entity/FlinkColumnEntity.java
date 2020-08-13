@@ -14,4 +14,5 @@ public class FlinkColumnEntity extends BaseEntity {
     // flink column data type
     private String dataType;
     private String expr;
+    private Integer position;
 }

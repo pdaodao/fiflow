@@ -7,17 +7,23 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SqlWrap {
+public class SqlWrap<T> {
     private final String sql;
+    private final Class<T> clazz;
     private final Object[] args;
 
-    private SqlWrap(String sql, Object[] args) {
+    private SqlWrap(String sql, Class<T> clazz, Object[] args) {
         this.sql = sql;
+        this.clazz = clazz;
         this.args = args;
     }
 
     public static SqlWrapBuilder builder() {
         return new SqlWrapBuilder();
+    }
+
+    public Class<T> getClazz() {
+        return clazz;
     }
 
     public String getSql() {
@@ -32,12 +38,17 @@ public class SqlWrap {
         private final StringBuilder sql = new StringBuilder();
         private final List<Object> params = new ArrayList<>();
         private final StringBuilder where = new StringBuilder();
+        private final StringBuilder orderBy = new StringBuilder();
+        private Class<?> clazz;
 
         public SqlWrap build() {
             if (where.length() > 0) {
                 sql.append(" WHERE ").append(where.toString());
             }
-            return new SqlWrap(sql.toString(), params.stream().toArray());
+            if (orderBy.length() > 0) {
+                sql.append(" ORDER BY ").append(orderBy.toString());
+            }
+            return new SqlWrap(sql.toString(), clazz, params.stream().toArray());
         }
 
         public SqlWrapBuilder count(Class<?> clazz) {
@@ -58,6 +69,7 @@ public class SqlWrap {
         }
 
         public SqlWrapBuilder from(Class<?> clazz, @Nullable String tableAlias) {
+            this.clazz = clazz;
             sql.append(" FROM ").append(DaoUtils.getTableName(clazz));
             if (tableAlias != null)
                 sql.append(" ").append(tableAlias);
@@ -66,6 +78,15 @@ public class SqlWrap {
 
         public SqlWrapBuilder from(Class<?> clazz) {
             return from(clazz, null);
+        }
+
+        public SqlWrapBuilder orderBy(String orderBy) {
+            if (StringUtils.isEmpty(orderBy)) return this;
+            if (this.orderBy.length() > 1) {
+                this.orderBy.append(",");
+            }
+            this.orderBy.append(orderBy);
+            return this;
         }
 
         public Join leftJoin(Class<?> clazz, String tableAlias) {

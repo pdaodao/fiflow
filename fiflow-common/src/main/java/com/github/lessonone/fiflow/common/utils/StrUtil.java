@@ -1,5 +1,9 @@
 package com.github.lessonone.fiflow.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.flink.calcite.shaded.org.apache.commons.codec.binary.Base64;
+import org.apache.flink.calcite.shaded.org.apache.commons.codec.digest.DigestUtils;
+
 public class StrUtil {
     public static final char UNDERLINE = '_';
 
@@ -13,6 +17,10 @@ public class StrUtil {
         return toSymbolCase(str, UNDERLINE);
     }
 
+    public static String sha256(String t) {
+        if (t == null) return StringUtils.EMPTY;
+        return Base64.encodeBase64String(DigestUtils.getSha256Digest().digest(t.getBytes()));
+    }
 
     /**
      * 将驼峰式命名的字符串转换为使用符号连接方式

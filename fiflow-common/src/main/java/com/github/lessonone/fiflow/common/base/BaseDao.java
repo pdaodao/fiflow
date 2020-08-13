@@ -56,6 +56,10 @@ public class BaseDao {
         return val;
     }
 
+    public <T> List<T> queryForList(SqlWrap sqlSelect) {
+        return queryForList(sqlSelect.getSql(), sqlSelect.getClazz(), sqlSelect.getArgs());
+    }
+
     public <T> List<T> queryForList(SqlWrap sqlSelect, Class<T> elementType) {
         return queryForList(sqlSelect.getSql(), elementType, sqlSelect.getArgs());
     }
@@ -65,6 +69,10 @@ public class BaseDao {
             return jdbcTemplate.queryForList(sql, elementType, args);
         }
         return jdbcTemplate.query(sql, new MyRowMapper<>(elementType), args);
+    }
+
+    public <T> Optional<T> queryForOne(SqlWrap<T> sqlSelect) {
+        return queryForOne(sqlSelect, sqlSelect.getClazz());
     }
 
     public <T> Optional<T> queryForOne(SqlWrap sqlSelect, Class<T> elementType) {
