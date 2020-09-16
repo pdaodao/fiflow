@@ -3,6 +3,8 @@ package com.github.lessonone.fiflow.common.utils;
 import com.github.lessonone.fiflow.common.base.Table;
 import com.github.lessonone.fiflow.common.base.TableField;
 import com.github.lessonone.fiflow.common.entity.BaseEntity;
+import com.github.lessonone.fiflow.common.entity.ClusterEntity;
+import com.github.lessonone.fiflow.common.pojo.ClusterType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.springframework.beans.BeanUtils;
@@ -65,6 +67,11 @@ public class DaoUtils {
                 id = (Long) value;
                 continue;
             }
+
+            if(value instanceof Enum){
+                value = ((Enum)value).name();
+            }
+
             rowMap.put(column, value);
         }
         return new Tuple2<Long, Map<String, Object>>(id, rowMap);

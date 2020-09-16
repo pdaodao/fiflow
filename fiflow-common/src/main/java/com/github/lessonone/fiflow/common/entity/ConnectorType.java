@@ -7,9 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * 连接类型
+ */
 @Data
-@Table("fi_flink_connector_type")
-public class FlinkConnectorType extends BaseEntity {
+@Table("ficonnector_type")
+public class ConnectorType extends BaseEntity {
     private Long id;
     private String pname;
     private String name;
@@ -40,8 +43,8 @@ public class FlinkConnectorType extends BaseEntity {
         return name;
     }
 
-    public FlinkConnectorType merge(FlinkConnectorType parent) {
-        FlinkConnectorType merge = new FlinkConnectorType();
+    public ConnectorType merge(ConnectorType parent) {
+        ConnectorType merge = new ConnectorType();
         merge.id = this.id;
         merge.pname = this.pname;
         merge.name = this.name;

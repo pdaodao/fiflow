@@ -1,9 +1,9 @@
 package com.github.lessonone.fiflow.common;
 
 import com.github.lessonone.fiflow.common.base.DbInfo;
-import com.github.lessonone.fiflow.common.entity.FlinkColumnEntity;
-import com.github.lessonone.fiflow.common.entity.FlinkDatabaseEntity;
-import com.github.lessonone.fiflow.common.entity.FlinkTableEntity;
+import com.github.lessonone.fiflow.common.entity.ColumnEntity;
+import com.github.lessonone.fiflow.common.entity.FlinkDatabase;
+import com.github.lessonone.fiflow.common.entity.TableEntity;
 import com.github.lessonone.fiflow.common.utils.DbUtils;
 import org.apache.flink.table.api.TableColumn;
 import org.apache.flink.table.api.TableSchema;
@@ -55,7 +55,7 @@ public class DbBasedCatalog extends AbstractCatalog {
 
     @Override
     public CatalogDatabase getDatabase(String databaseName) throws DatabaseNotExistException, CatalogException {
-        Optional<FlinkDatabaseEntity> db = metaDbDao.getDatabase(getName(), databaseName);
+        Optional<FlinkDatabase> db = metaDbDao.getDatabase(getName(), databaseName);
         if (!db.isPresent())
             throw new DatabaseNotExistException(getName(), databaseName);
         return db.get().toCatalogDatabase();
@@ -63,7 +63,7 @@ public class DbBasedCatalog extends AbstractCatalog {
 
     @Override
     public boolean databaseExists(String databaseName) throws CatalogException {
-        Optional<FlinkDatabaseEntity> db = metaDbDao.getDatabase(getName(), databaseName);
+        Optional<FlinkDatabase> db = metaDbDao.getDatabase(getName(), databaseName);
         return db.isPresent();
     }
 
@@ -94,17 +94,17 @@ public class DbBasedCatalog extends AbstractCatalog {
 
     @Override
     public CatalogBaseTable getTable(ObjectPath tablePath) throws TableNotExistException, CatalogException {
-        final Optional<FlinkTableEntity> tableEntity = metaDbDao.getTable(getName(), tablePath.getDatabaseName(), tablePath.getObjectName());
+        final Optional<TableEntity> tableEntity = metaDbDao.getTable(getName(), tablePath.getDatabaseName(), tablePath.getObjectName());
         if (!tableEntity.isPresent())
             throw new TableNotExistException(getName(), tablePath);
 
-        final FlinkTableEntity tableInfo = tableEntity.get();
+        final TableEntity tableInfo = tableEntity.get();
 
         // 字段信息 表结构
-        List<FlinkColumnEntity> columns = metaDbDao.getColumns(tableInfo.getId());
+        List<ColumnEntity> columns = metaDbDao.getColumns(tableInfo.getId());
         TableSchema.Builder schemaBuilder = TableSchema.builder();
         if (columns != null) {
-            for (FlinkColumnEntity column : columns) {
+            for (ColumnEntity column : columns) {
                 DataType dataType = TypeConversions.fromLogicalToDataType(LogicalTypeParser.parse(column.getDataType()));
                 if (column.getExpr() == null) {
                     schemaBuilder.add(TableColumn.of(column.getName(), dataType));

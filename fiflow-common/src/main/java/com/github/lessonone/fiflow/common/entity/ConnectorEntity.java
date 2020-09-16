@@ -7,9 +7,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 
+/**
+ * 物理连接
+ */
 @Data
-@Table("fi_flink_connector")
-public class FlinkConnector extends BaseEntity {
+@Table("fi_connector")
+public class ConnectorEntity extends BaseEntity {
     private String name;
     private String typeName;
     private String hashCode;

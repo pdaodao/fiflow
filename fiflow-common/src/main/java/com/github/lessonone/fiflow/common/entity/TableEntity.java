@@ -8,8 +8,8 @@ import java.util.Map;
 
 
 @Data
-@Table("fi_flink_table")
-public class FlinkTableEntity extends BaseEntity {
+@Table("fi_table")
+public class TableEntity extends BaseEntity {
     private Long databaseId;
     private Long connectorId;
     // flink table name (ddl: create table $name)

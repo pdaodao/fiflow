@@ -25,7 +25,7 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 public class DbBasedDao extends BaseDao {
     public static final String Connector = "connector";
 
-    public static Cache<String, FlinkConnectorType> connectorTypeCache = CacheBuilder.newBuilder()
+    public static Cache<String, ConnectorType> connectorTypeCache = CacheBuilder.newBuilder()
             .expireAfterWrite(5, TimeUnit.MINUTES)
             .maximumSize(200)
             .build();
@@ -35,10 +35,10 @@ public class DbBasedDao extends BaseDao {
         super(ds);
     }
 
-    public List<FlinkConnectorType> connectorTypeList() {
-        List<FlinkConnectorType> types = queryForList(SqlWrap.builder().select("*").from(FlinkConnectorType.class).build(),
-                FlinkConnectorType.class);
-        final Map<String, FlinkConnectorType> map = new HashMap<>();
+    public List<ConnectorType> connectorTypeList() {
+        List<ConnectorType> types = queryForList(SqlWrap.builder().select("*").from(ConnectorType.class).build(),
+                ConnectorType.class);
+        final Map<String, ConnectorType> map = new HashMap<>();
         types.forEach(t -> {
             map.put(t.getName().toLowerCase(), t);
         });
@@ -50,15 +50,15 @@ public class DbBasedDao extends BaseDao {
         }).collect(Collectors.toList());
     }
 
-    public Optional<FlinkConnector> getConnectorById(Long id) {
-        return queryForOne(SqlWrap.builder().select("*").from(FlinkConnector.class).where("id").equal(id).build());
+    public Optional<ConnectorEntity> getConnectorById(Long id) {
+        return queryForOne(SqlWrap.builder().select("*").from(ConnectorEntity.class).where("id").equal(id).build());
     }
 
-    public Optional<FlinkConnectorType> getConnectorType(String connector) {
+    public Optional<ConnectorType> getConnectorType(String connector) {
         connector = connector.toLowerCase();
-        FlinkConnectorType connectorType = connectorTypeCache.getIfPresent(connector);
+        ConnectorType connectorType = connectorTypeCache.getIfPresent(connector);
         if (connectorType != null) return Optional.of(connectorType);
-        List<FlinkConnectorType> types = connectorTypeList();
+        List<ConnectorType> types = connectorTypeList();
         types.stream().forEach(t -> {
             connectorTypeCache.put(t.getName().toLowerCase(), t);
         });
@@ -68,7 +68,7 @@ public class DbBasedDao extends BaseDao {
     public List<String> listCatalogs() {
         SqlWrap sql = SqlWrap.builder()
                 .select("distinct catalog")
-                .from(FlinkDatabaseEntity.class)
+                .from(FlinkDatabase.class)
                 .build();
 
         return queryForList(sql, String.class);
@@ -77,29 +77,29 @@ public class DbBasedDao extends BaseDao {
     public List<String> listDatabases(String catalog) {
         SqlWrap sql = SqlWrap.builder()
                 .select("name")
-                .from(FlinkDatabaseEntity.class)
+                .from(FlinkDatabase.class)
                 .where("catalog").equal(catalog)
                 .build();
         return queryForList(sql, String.class);
     }
 
-    public Optional<FlinkDatabaseEntity> getDatabase(String catalog, String databaseName) {
+    public Optional<FlinkDatabase> getDatabase(String catalog, String databaseName) {
         SqlWrap sql = SqlWrap.builder()
                 .select("*")
-                .from(FlinkDatabaseEntity.class)
+                .from(FlinkDatabase.class)
                 .whereSql("catalog = ? and name = ?", catalog, databaseName)
                 .build();
-        return queryForOne(sql, FlinkDatabaseEntity.class);
+        return queryForOne(sql, FlinkDatabase.class);
     }
 
     public void createDatabase(final String catalog, final String name, CatalogDatabase database, boolean ignoreIfExists) throws DatabaseAlreadyExistException, CatalogException {
-        Optional<FlinkDatabaseEntity> dbInfo = getDatabase(catalog, name);
+        Optional<FlinkDatabase> dbInfo = getDatabase(catalog, name);
         if (dbInfo.isPresent()) {
             if (!ignoreIfExists)
                 throw new DatabaseAlreadyExistException(catalog, name);
             return;
         }
-        FlinkDatabaseEntity db = new FlinkDatabaseEntity();
+        FlinkDatabase db = new FlinkDatabase();
         db.setCatalog(catalog);
         db.setName(name);
         db.setProperties(database.getProperties());
@@ -109,7 +109,7 @@ public class DbBasedDao extends BaseDao {
 
     public void dropDatabase(final String catalog, final String databaseName, boolean ignoreIfNotExists, boolean cascade) throws DatabaseNotExistException, DatabaseNotEmptyException, CatalogException {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName));
-        Optional<FlinkDatabaseEntity> dbInfo = getDatabase(catalog, databaseName);
+        Optional<FlinkDatabase> dbInfo = getDatabase(catalog, databaseName);
         if (!dbInfo.isPresent()) {
             if (!ignoreIfNotExists) throw new DatabaseNotExistException(catalog, databaseName);
             return;
@@ -117,7 +117,7 @@ public class DbBasedDao extends BaseDao {
         final Long dbId = dbInfo.get().getId();
 
         Optional<Long> count = queryForOne(
-                SqlWrap.builder().count(FlinkTableEntity.class)
+                SqlWrap.builder().count(TableEntity.class)
                         .where("database_id").equal(dbId)
                         .build(), Long.class);
 
@@ -127,18 +127,18 @@ public class DbBasedDao extends BaseDao {
         }
         transactionWrap(() -> {
             final SqlWrap deleteColumnSql = SqlWrap.builder()
-                    .delete(FlinkColumnEntity.class)
+                    .delete(ColumnEntity.class)
                     .where("table_id").in(SqlWrap
                             .builder()
-                            .select("id").from(FlinkTableEntity.class)
+                            .select("id").from(TableEntity.class)
                             .where("database_id").equal(dbId)
                             .build()
                     ).build();
             final SqlWrap deleteTableSql = SqlWrap.builder()
-                    .delete(FlinkTableEntity.class)
+                    .delete(TableEntity.class)
                     .where("database_id").equal(dbId)
                     .build();
-            final SqlWrap deleteDb = SqlWrap.builder().delete(FlinkDatabaseEntity.class).build();
+            final SqlWrap deleteDb = SqlWrap.builder().delete(FlinkDatabase.class).build();
 
             update(deleteColumnSql);
             update(deleteTableSql);
@@ -148,9 +148,9 @@ public class DbBasedDao extends BaseDao {
     }
 
     public void renameTable(final String catalog, final ObjectPath tablePath, final String newTableName) {
-        Optional<FlinkTableEntity> tableInfo = getTable(catalog, tablePath.getDatabaseName(), tablePath.getObjectName());
+        Optional<TableEntity> tableInfo = getTable(catalog, tablePath.getDatabaseName(), tablePath.getObjectName());
         if (tableInfo.isPresent()) {
-            FlinkTableEntity info = tableInfo.get();
+            TableEntity info = tableInfo.get();
             if (!info.getName().equals(newTableName)) {
                 info.setName(newTableName);
                 update(info);
@@ -159,7 +159,7 @@ public class DbBasedDao extends BaseDao {
     }
 
     public void dropTable(String catalog, String databaseName, String tableName, boolean ignoreIfNotExists) throws TableNotExistException, CatalogException {
-        Optional<FlinkTableEntity> table = getTable(catalog, databaseName, tableName);
+        Optional<TableEntity> table = getTable(catalog, databaseName, tableName);
         if (!table.isPresent()) {
             if (ignoreIfNotExists) return;
             throw new TableNotExistException(catalog, new ObjectPath(databaseName, tableName));
@@ -167,10 +167,10 @@ public class DbBasedDao extends BaseDao {
         final Long tableId = table.get().getId();
         transactionWrap(() -> {
             SqlWrap deleteColumnSql = SqlWrap.builder()
-                    .delete(FlinkColumnEntity.class)
+                    .delete(ColumnEntity.class)
                     .where("table_id").equal(tableId)
                     .build();
-            SqlWrap deleteTableSql = SqlWrap.builder().delete(FlinkTableEntity.class)
+            SqlWrap deleteTableSql = SqlWrap.builder().delete(TableEntity.class)
                     .where("id").equal(tableId).build();
             update(deleteColumnSql);
             update(deleteTableSql);
@@ -180,10 +180,10 @@ public class DbBasedDao extends BaseDao {
 
 
     public void alterDatabase(final String catalog, final String databaseName, CatalogDatabase newDatabase, boolean ignoreIfNotExists) throws DatabaseNotExistException, CatalogException {
-        final Optional<FlinkDatabaseEntity> db = getDatabase(catalog, databaseName);
+        final Optional<FlinkDatabase> db = getDatabase(catalog, databaseName);
         if (!db.isPresent())
             throw new DatabaseNotExistException(catalog, databaseName);
-        final FlinkDatabaseEntity dbInfo = db.get();
+        final FlinkDatabase dbInfo = db.get();
         dbInfo.setComment(newDatabase.getComment());
         dbInfo.setProperties(newDatabase.getProperties());
 
@@ -193,8 +193,8 @@ public class DbBasedDao extends BaseDao {
     public List<String> listTables(final String catalog, final String databaseName) {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName), "databaseName cannot be null or empty");
         SqlWrap sqlSelect = SqlWrap.builder()
-                .select("a.name").from(FlinkTableEntity.class, "a")
-                .innerJoin(FlinkDatabaseEntity.class, "b")
+                .select("a.name").from(TableEntity.class, "a")
+                .innerJoin(FlinkDatabase.class, "b")
                 .on("a.database_id = b.id")
                 .where("b.catalog").equal(catalog)
                 .and("b.name").equal(databaseName)
@@ -205,10 +205,10 @@ public class DbBasedDao extends BaseDao {
 
     private Long getOrCreateDatabase(final String catalog, final String databaseName) {
         checkArgument(!StringUtils.isNullOrWhitespaceOnly(databaseName), "databaseName cannot be null or empty");
-        Optional<FlinkDatabaseEntity> dbInfo = getDatabase(catalog, databaseName);
+        Optional<FlinkDatabase> dbInfo = getDatabase(catalog, databaseName);
         if (dbInfo.isPresent()) return dbInfo.get().getId();
 
-        FlinkDatabaseEntity db = new FlinkDatabaseEntity();
+        FlinkDatabase db = new FlinkDatabase();
         db.setCatalog(catalog);
         db.setName(databaseName);
         return insert(db);
@@ -225,13 +225,13 @@ public class DbBasedDao extends BaseDao {
      * @param tableEntity
      * @param connectorName
      */
-    private void getOrCreateConnector(final FlinkTableEntity tableEntity, final String connectorName) {
+    private void getOrCreateConnector(final TableEntity tableEntity, final String connectorName) {
         if (tableEntity.getProperties() == null) return;
         String connector = tableEntity.getProperties().get(Connector);
         if (connector == null) return;
-        Optional<FlinkConnectorType> typeOptional = getConnectorType(connector);
+        Optional<ConnectorType> typeOptional = getConnectorType(connector);
         if (!typeOptional.isPresent()) return;
-        FlinkConnectorType type = typeOptional.get();
+        ConnectorType type = typeOptional.get();
         if (type.getOptions() == null || type.getOptions().size() < 1) return;
 
         tableEntity.getProperties().remove(Connector);
@@ -245,7 +245,7 @@ public class DbBasedDao extends BaseDao {
 
         Map<String, String> connectorProperties = new LinkedHashMap<>();
         StringBuilder sb = new StringBuilder();
-        for (Map.Entry<String, FlinkConnectorType.OptionDescriptor> entry : type.getOptions().entrySet()) {
+        for (Map.Entry<String, ConnectorType.OptionDescriptor> entry : type.getOptions().entrySet()) {
             String key = entry.getKey();
             String value = tableEntity.getProperties().get(key);
             if (value != null) {
@@ -259,14 +259,14 @@ public class DbBasedDao extends BaseDao {
 
         final String hashCode = StrUtil.sha256(sb.toString());
 
-        Optional<FlinkConnector> realConnector = queryForOne(SqlWrap.builder().select("id").from(FlinkConnector.class)
+        Optional<ConnectorEntity> realConnector = queryForOne(SqlWrap.builder().select("id").from(ConnectorEntity.class)
                 .where("hash_code").equal(hashCode)
                 .build());
         if (realConnector.isPresent()) {
             tableEntity.setConnectorId(realConnector.get().getId());
             return;
         }
-        FlinkConnector toAddConnector = new FlinkConnector();
+        ConnectorEntity toAddConnector = new ConnectorEntity();
         toAddConnector.setName(connectorName);
         toAddConnector.setTypeName(connector);
         toAddConnector.setHashCode(hashCode);
@@ -279,10 +279,10 @@ public class DbBasedDao extends BaseDao {
 
     public boolean createTable(String catalog, ObjectPath tablePath, CatalogBaseTable table, boolean ignoreIfExists) {
         Long dbId = getOrCreateDatabase(catalog, tablePath.getDatabaseName());
-        Optional<FlinkTableEntity> oldTable = getTable(catalog, tablePath.getDatabaseName(), tablePath.getObjectName());
+        Optional<TableEntity> oldTable = getTable(catalog, tablePath.getDatabaseName(), tablePath.getObjectName());
 
 
-        FlinkTableEntity tableInfo = new FlinkTableEntity();
+        TableEntity tableInfo = new TableEntity();
         tableInfo.setDatabaseId(dbId);
         tableInfo.setName(tablePath.getObjectName());
         tableInfo.setProperties(table.getOptions());
@@ -309,7 +309,7 @@ public class DbBasedDao extends BaseDao {
             int i = 1;
             for (TableColumn column : table.getSchema().getTableColumns()) {
                 String dataType = column.getType().toString();
-                FlinkColumnEntity field = new FlinkColumnEntity();
+                ColumnEntity field = new ColumnEntity();
                 field.setTableId(tableId);
                 field.setName(column.getName());
                 field.setDataType(dataType);
@@ -326,8 +326,8 @@ public class DbBasedDao extends BaseDao {
     public boolean tableExists(String catalog, String databaseName, String tableName) {
         SqlWrap sql = SqlWrap.builder()
                 .select("t.id")
-                .from(FlinkDatabaseEntity.class, "d")
-                .innerJoin(FlinkTableEntity.class, "t")
+                .from(FlinkDatabase.class, "d")
+                .innerJoin(TableEntity.class, "t")
                 .on("d.id = t.database_id")
                 .where("d.catalog").equal(catalog)
                 .and("d.name").equal(databaseName)
@@ -337,24 +337,24 @@ public class DbBasedDao extends BaseDao {
         return id.isPresent();
     }
 
-    public Optional<FlinkTableEntity> getTable(final String catalog, final String databaseName, final String tableName) {
+    public Optional<TableEntity> getTable(final String catalog, final String databaseName, final String tableName) {
         SqlWrap sql = SqlWrap.builder()
                 .select("t.*")
-                .from(FlinkDatabaseEntity.class, "d")
-                .innerJoin(FlinkTableEntity.class, "t")
+                .from(FlinkDatabase.class, "d")
+                .innerJoin(TableEntity.class, "t")
                 .on("d.id = t.database_id")
                 .where("d.catalog").equal(catalog)
                 .and("d.name").equal(databaseName)
                 .and("t.name").equal(tableName)
                 .build();
-        Optional<FlinkTableEntity> table = queryForOne(sql, FlinkTableEntity.class);
+        Optional<TableEntity> table = queryForOne(sql, TableEntity.class);
         if (table.isPresent() && table.get().getConnectorId() != null) {
-            Optional<FlinkConnector> connectorOptional = getConnectorById(table.get().getConnectorId());
+            Optional<ConnectorEntity> connectorOptional = getConnectorById(table.get().getConnectorId());
             if (connectorOptional.isPresent()) {
-                FlinkConnector connector = connectorOptional.get();
+                ConnectorEntity connector = connectorOptional.get();
                 Map<String, String> props = connector.mergeTableProperties(table.get().getProperties());
 
-                Optional<FlinkConnectorType> connectorType = getConnectorType(connector.getTypeName());
+                Optional<ConnectorType> connectorType = getConnectorType(connector.getTypeName());
                 if (connectorType.isPresent()) {
                     props.put(Connector, connectorType.get().getConnector());
                     if (connectorType.get().getObjectKey() != null && table.get().getObjectName() != null) {
@@ -367,9 +367,9 @@ public class DbBasedDao extends BaseDao {
         return table;
     }
 
-    public List<FlinkColumnEntity> getColumns(Long tableId) {
+    public List<ColumnEntity> getColumns(Long tableId) {
         SqlWrap sql = SqlWrap.builder()
-                .select("*").from(FlinkColumnEntity.class)
+                .select("*").from(ColumnEntity.class)
                 .where("table_id").equal(tableId)
                 .orderBy("position asc")
                 .build();

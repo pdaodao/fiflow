@@ -8,10 +8,12 @@ import org.apache.flink.table.catalog.CatalogDatabaseImpl;
 import java.util.HashMap;
 import java.util.Map;
 
-
+/**
+ * flink catalog 中的 数据库概念
+ */
 @Data
 @Table("fi_flink_database")
-public class FlinkDatabaseEntity extends BaseEntity {
+public class FlinkDatabase extends BaseEntity {
     private String catalog;
     private String name;
     private Map<String, String> properties;

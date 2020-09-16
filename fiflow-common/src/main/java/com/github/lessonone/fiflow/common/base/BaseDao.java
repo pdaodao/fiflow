@@ -27,6 +27,7 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -106,6 +107,8 @@ public class BaseDao {
 
     public <T extends BaseEntity> Long insert(T entity, boolean isSelective) {
         final String tableName = DaoUtils.getTableName(entity);
+        entity.setCreateTime(new Date());
+        entity.setModifyTime(entity.getCreateTime());
         Tuple2<Long, Map<String, Object>> t = DaoUtils.entityToMap(entity);
         if (t == null) throw new RuntimeException("insert entity is null");
         return insertInto(tableName, t.f1, isSelective);
@@ -143,6 +146,9 @@ public class BaseDao {
 
     public int updateById(String tableName, Long id, Map<String, Object> rowMap, boolean isIgnoreNull) {
         if (rowMap == null) return 0;
+        rowMap.remove("create_time");
+        rowMap.put("modify_time", new Date());
+
         StringBuilder sql = new StringBuilder("UPDATE " + tableName + " SET ");
         List<String> fields = new ArrayList<>();
         List<Object> params = new ArrayList<>();

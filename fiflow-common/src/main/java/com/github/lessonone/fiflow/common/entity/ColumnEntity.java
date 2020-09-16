@@ -4,11 +4,11 @@ import com.github.lessonone.fiflow.common.base.Table;
 import lombok.Data;
 
 /**
- * fi_flink_table_column
+ * 字段信息
  */
 @Data
-@Table("fi_flink_table_column")
-public class FlinkColumnEntity extends BaseEntity {
+@Table("fi_table_column")
+public class ColumnEntity extends BaseEntity {
     private Long tableId;
     private String name;
     // flink column data type
