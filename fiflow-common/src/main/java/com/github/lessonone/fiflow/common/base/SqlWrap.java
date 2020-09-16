@@ -150,6 +150,7 @@ public class SqlWrap<T> {
         }
 
         public SqlWrapBuilder equal(Object value) {
+            if(value == null) return sqlSelect;
             before();
             sqlSelect.where.append(field).append(" = ?");
             return addArgs(value);

@@ -8,7 +8,7 @@ import java.util.Map;
 
 
 /**
- * 物理连接
+ * 物理连接 连接到 jdbc 、kafka hive elasticsearch 等
  */
 @Data
 @Table("fi_connector")
@@ -17,6 +17,9 @@ public class ConnectorEntity extends BaseEntity {
     private String typeName;
     private String hashCode;
     private String comment;
+
+    // 连接信息 如 jdbc 的 url 连接串
+    private String url;
 
     // 连接属性
     private Map<String, String> options;

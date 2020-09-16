@@ -1,6 +1,6 @@
 package com.github.lessonone.fiflow.common;
 
-import com.github.lessonone.fiflow.common.base.BaseDao;
+import com.github.lessonone.fiflow.common.base.CommonMapper;
 import com.github.lessonone.fiflow.common.base.SqlWrap;
 import com.github.lessonone.fiflow.common.entity.*;
 import com.github.lessonone.fiflow.common.utils.StrUtil;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 
-public class DbBasedDao extends BaseDao {
+public class DbBasedDao extends CommonMapper {
     public static final String Connector = "connector";
 
     public static Cache<String, ConnectorType> connectorTypeCache = CacheBuilder.newBuilder()

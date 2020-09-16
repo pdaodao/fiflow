@@ -33,13 +33,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-public class BaseDao {
-    public static final Logger logger = LoggerFactory.getLogger(BaseDao.class);
+public class CommonMapper {
+    public static final Logger logger = LoggerFactory.getLogger(CommonMapper.class);
     private transient final DataSource dataSource;
     private transient final JdbcTemplate jdbcTemplate;
     private transient final TransactionTemplate transactionTemplate;
 
-    public BaseDao(DataSource ds) {
+    public CommonMapper(DataSource ds) {
         this.dataSource = ds;
         this.jdbcTemplate = DbUtils.createJdbcTemplate(ds);
         this.transactionTemplate = DbUtils.createTransactionTemplate(ds);

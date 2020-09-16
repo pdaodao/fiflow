@@ -1,7 +1,7 @@
 package com.github.lessonone.fiflow.web.controller;
 
 import com.github.lessonone.fiflow.common.entity.ClusterEntity;
-import com.github.lessonone.fiflow.common.service.ClusterDao;
+import com.github.lessonone.fiflow.common.dao.ClusterDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

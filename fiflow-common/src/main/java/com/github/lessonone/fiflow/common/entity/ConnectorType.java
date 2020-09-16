@@ -11,7 +11,7 @@ import java.util.Map;
  * 连接类型
  */
 @Data
-@Table("ficonnector_type")
+@Table("fi_connector_type")
 public class ConnectorType extends BaseEntity {
     private Long id;
     private String pname;
