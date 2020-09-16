@@ -23,20 +23,20 @@ import java.util.Optional;
 /**
  * 把数据库 数据表 字段信息 保存在 mysql 数据库中
  */
-public class FlinkInDbCatalog extends AbstractCatalog {
+public class DbBasedCatalog extends AbstractCatalog {
     public static final String DEFAULT_DB = "default";
     private final DbInfo dbInfo;
-    private MetaDbDao metaDbDao;
+    private DbBasedDao metaDbDao;
     // 参考
     private GenericInMemoryCatalog inMemoryCatalog;
 
-    public FlinkInDbCatalog(String name, String defaultDatabase, DbInfo dbInfo) {
+    public DbBasedCatalog(String name, String defaultDatabase, DbInfo dbInfo) {
         super(name, defaultDatabase);
         this.dbInfo = dbInfo;
-        this.metaDbDao = new MetaDbDao(DbUtils.createDatasource(dbInfo));
+        this.metaDbDao = new DbBasedDao(DbUtils.createDatasource(dbInfo));
     }
 
-    public FlinkInDbCatalog(String name, DbInfo dbInfo) {
+    public DbBasedCatalog(String name, DbInfo dbInfo) {
         this(name, DEFAULT_DB, dbInfo);
     }
 

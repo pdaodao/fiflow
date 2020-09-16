@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.flink.util.Preconditions.checkArgument;
 
-public class MetaDbDao extends BaseDao {
+public class DbBasedDao extends BaseDao {
     public static final String Connector = "connector";
 
     public static Cache<String, FlinkConnectorType> connectorTypeCache = CacheBuilder.newBuilder()
@@ -31,7 +31,7 @@ public class MetaDbDao extends BaseDao {
             .build();
 
 
-    public MetaDbDao(DataSource ds) {
+    public DbBasedDao(DataSource ds) {
         super(ds);
     }
 

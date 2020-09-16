@@ -19,21 +19,21 @@ import static org.apache.flink.util.Preconditions.checkArgument;
 /**
  * 直接从物理数据库中读取数据表结构信息 转换成 flink 需要的 ddl 信息
  */
-public class FlinkMetaCatalog extends AbstractCatalog {
+public class MetaBasedCatalog extends AbstractCatalog {
     public static final String DEFAULT_DB = "default";
     private final Catalog backedCatalog;
     private final Map<String, DbInfo> databases;
     private final DispatchMetaReader dispatchMetaReader;
 
-    public FlinkMetaCatalog(String name) {
+    public MetaBasedCatalog(String name) {
         this(name, DEFAULT_DB);
     }
 
-    public FlinkMetaCatalog(String name, String defaultDatabase) {
+    public MetaBasedCatalog(String name, String defaultDatabase) {
         this(name, defaultDatabase, new GenericInMemoryCatalog(name, defaultDatabase));
     }
 
-    public FlinkMetaCatalog(String name, String defaultDatabase, Catalog backed) {
+    public MetaBasedCatalog(String name, String defaultDatabase, Catalog backed) {
         super(name, defaultDatabase);
         checkArgument(backed != null, "backed catalog is null for FlinkMetaCatalog");
         this.databases = new LinkedHashMap<>();
