@@ -15,7 +15,7 @@
     <properties>
         <!--日志-->
         <slf4j.verision>1.7.18</slf4j.verision>
-        <logback.version>1.1.6</logback.version>
+        <logback.version>1.2.0</logback.version>
     </properties>
 
     <dependencies>
